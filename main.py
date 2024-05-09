@@ -27,3 +27,16 @@ def configure_logging(filename: str = "appdata/script.log") -> None:
         None
     """
     logging.basicConfig(filename=filename, level=logging.INFO, format="%(asctime)s - %(module)s(%(lineno)d) - %(levelname)s -> %(message)s")
+
+
+def create_app_require_directories(dirs: list | tuple = ["appdata", "images", "output"]) -> None:
+    """A function that creates the required directories for the application.
+
+    Parameters:
+        dirs (list | tuple): A list or tuple of directory names. Default value is ["appdata", "images", "output"].
+
+    Returns:
+        None
+    """
+    for directory in dirs:
+        os.makedirs(directory, exist_ok=True)
