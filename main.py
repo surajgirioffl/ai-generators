@@ -15,6 +15,8 @@ __version__ = "0.0.0"
 import logging
 import os
 import re
+from undetected_chromedriver import Chrome, ChromeOptions
+from undetected_edgedriver import Edge, EdgeOptions
 
 
 def configure_logging(filename: str = "appdata/script.log") -> None:
@@ -89,3 +91,29 @@ def parse_config_file(file_path: str = "config.txt", set_as_global: bool = True)
             global CONFIG
             CONFIG = config_dict
         return config_dict
+
+
+def get_webdriver_instance(browser: str = "chrome", headless=False) -> Chrome | Edge | None:
+    """Function to get the webdriver instance for the given browser.
+
+    Args:
+        browser (str, optional): Desired browser (chrome or edge). Defaults to "chrome".
+        headless (bool, optional): Set to True for headless mode. Defaults to False.
+
+    Returns:
+        Chrome | Edge | None: Webdriver instance if browser is supported, else None.
+    """
+    if browser == "chrome":
+        options = ChromeOptions()
+        if headless:
+            options.add_argument("--headless")
+        return Chrome(options=options)
+    elif browser == "edge":
+        options = EdgeOptions()
+        if headless:
+            options.add_argument("--headless")
+        return Edge(options=options)
+    else:
+        print("Browser not supported. Please use Chrome or Edge. Error Code: 1104")
+        logging.info("Browser not supported. Please use Chrome or Edge. Error Code: 1104")
+        return None
