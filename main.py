@@ -117,3 +117,35 @@ def get_webdriver_instance(browser: str = "chrome", headless=False) -> Chrome | 
         print("Browser not supported. Please use Chrome or Edge. Error Code: 1104")
         logging.info("Browser not supported. Please use Chrome or Edge. Error Code: 1104")
         return None
+
+
+def main() -> None:
+    """Driver function to integrate and execute the script.
+
+    Returns:
+        None
+    """
+    # ----------------- Setting basic configuration -----------------------
+    create_app_require_directories()
+    parse_config_file()
+    configure_logging(CONFIG["Default_location_start"]["default_log_location_local"])
+    logging.info("-----------------STARTING A NEW SESSION-----------------")
+
+    # ------------------ Main workflow will start from here ---------------------
+    option_enabled = False  # Specify if the options are enabled
+
+    if CONFIG["options_start"]["use_images"] == "Y":
+        option_enabled = True
+        ...
+
+    if CONFIG["options_start"]["use_prompts"] == "Y":
+        option_enabled = True
+        ...
+
+    if not option_enabled:
+        print("No options are enabled to generate video. Please enable at least one option. Error Code: 1103")
+        logging.info("No options are enabled to generate video. Please enable at least one option. Error Code: 1103")
+
+
+if __name__ == "__main__":
+    main()
