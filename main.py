@@ -119,6 +119,21 @@ def get_webdriver_instance(browser: str = "chrome", headless=False) -> Chrome | 
         return None
 
 
+def login_to_google_account(driver: Chrome | Edge, url: str = "https://accounts.google.com") -> bool:
+    """Function to login to google account.
+
+    Args:
+        driver (Chrome | Edge): Webdriver instance.
+        url (str, optional): URL to login. Defaults to "https://accounts.google.com".
+
+    Returns:
+        bool: Returns True if logged in successfully else False.
+    """
+    driver.get(url)
+    user_input = input("Press enter if googled logged in successfully else any key: ")
+    return True if not user_input else False
+
+
 def main() -> None:
     """Driver function to integrate and execute the script.
 
@@ -132,6 +147,13 @@ def main() -> None:
     logging.info("-----------------STARTING A NEW SESSION-----------------")
 
     # ------------------ Main workflow will start from here ---------------------
+    driver = get_webdriver_instance()
+    if not login_to_google_account(driver):
+        print("Error: Google login failed. Error Code: 1105")
+        logging.error("Google login failed. Error Code: 1105")
+        driver.quit()
+        return False
+
     option_enabled = False  # Specify if the options are enabled
 
     if CONFIG["options_start"]["use_images"] == "Y":
@@ -142,9 +164,13 @@ def main() -> None:
         option_enabled = True
         ...
 
+    driver.quit()  # Closing the browser
+
     if not option_enabled:
         print("No options are enabled to generate video. Please enable at least one option. Error Code: 1103")
         logging.info("No options are enabled to generate video. Please enable at least one option. Error Code: 1103")
+        return False
+    return True
 
 
 if __name__ == "__main__":
