@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 7th May 2024
-Last-modified: 11th May 2024
+Last-modified: 12th May 2024
 Error-series: 1100
 """
 
@@ -17,6 +17,11 @@ import os
 import re
 from undetected_chromedriver import Chrome, ChromeOptions
 from undetected_edgedriver import Edge, EdgeOptions
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import TimeoutException
 
 
 def configure_logging(filename: str = "appdata/script.log") -> None:
@@ -132,6 +137,48 @@ def login_to_google_account(driver: Chrome | Edge, url: str = "https://accounts.
     driver.get(url)
     user_input = input("Press enter if googled logged in successfully else any key: ")
     return True if not user_input else False
+
+
+def login_to_google_with_email_and_password(
+    driver: Chrome | Edge, email: str, password: str, url: str = "https://accounts.google.com"
+) -> bool:
+    """A function to login to Google with an email and password using a web driver.
+
+    Args:
+        driver (Chrome | Edge): The web driver to use for logging in.
+        email (str): The email address to use for login.
+        password (str): The password to use for login.
+        url (str, optional): The URL to navigate to for login. Default is "https://accounts.google.com".
+
+    Returns:
+        bool: True if login is successful, False otherwise.
+    """
+    driver.get(url)
+    wait = WebDriverWait(driver, 10)
+    try:
+        email_input = wait.until(EC.visibility_of_element_located((By.ID, "identifierId")))
+        email_input.send_keys(email)
+        email_input.send_keys(Keys.ENTER)
+
+        password_input = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input[name='Passwd']")))
+        password_input.send_keys(password)
+        password_input.send_keys(Keys.ENTER)
+
+        # Checking if login successful
+        try:
+            wait.until(EC.url_contains("https://myaccount.google.com"))
+        except TimeoutException as e:
+            raise Exception(f"Login Failed. TimeoutException: {e}")
+
+    except Exception as e:
+        print(f"Exception: {e}")
+        print("Google login failed by email and password. Error Code: 1106")
+        logging.error(f"Exception: {e}")
+        logging.error("Google login failed by email and password. Error Code: 1106")
+        logging.info("Please login manually...")
+        return False
+    else:
+        return True
 
 
 def main() -> None:
