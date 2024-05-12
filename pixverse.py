@@ -59,3 +59,59 @@ def create_video_from_prompt(driver: Chrome | Edge | Any, prompt: str, seed: int
     driver.find_element(By.CSS_SELECTOR, seed_button_selector).send_keys(seed)
     submit_button_selector = 'button[type="submit"]'
     driver.find_element(By.CSS_SELECTOR, submit_button_selector).click()
+
+
+def create_video_from_images(
+    driver: Chrome | Edge | Any,
+    image_path: str,
+    motion_strength: float | int | str,
+    seed: int | str,
+    prompt: str = "",
+    hd=False,
+):
+    """Function to create video using image.
+
+    Args:
+        driver (Chrome | Edge | Any): the driver to use for the operation
+        image_path (str): the path to the images to create the video from
+        motion_strength (float | int | str): the strength of the motion for the video
+        seed: int | str - the seed value for the video creation
+        prompt (str): optional prompt for the video creation
+        hd (bool): whether to enable HD quality for the video
+
+    Result:
+        None
+    """
+    logging.info("Creating video from images...")
+    wait = WebDriverWait(driver, 20)
+
+    # Click on the 'create video' button when it appears
+    create_video_button_selector = ".ant-btn.css-sjdo89.ant-btn-default.px-8.border-none.rounded-full"
+    wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, create_video_button_selector))).click()
+
+    create_video_from_image_button_selector = ".p-2.rounded-md.cursor-pointer.flex.items-center.gap-2"
+    driver.find_elements(By.CSS_SELECTOR, create_video_from_image_button_selector)[1].click()
+
+    # Image upload button
+    # image_upload_button_selector = ".ant-btn.css-1ntsptu.ant-btn-text.ant-btn-sm"
+    image_file_input_selector = 'input[type="file"]'
+    wait.until(expected_conditions.presence_of_element_located((By.CSS_SELECTOR, image_file_input_selector))).send_keys(image_path)
+    driver.find_element(By.ID, "Prompt").send_keys(prompt)  # Prompt if any
+    motion_strength_input_xpath = (
+        '//*[@id="root"]/div/div/div[2]/div/main/div[1]/div/div[1]/form/div/div[5]/div[2]/div/div/div/div/div[1]/div/div[2]/input'
+    )
+    driver.find_element(By.XPATH, motion_strength_input_xpath).send_keys(motion_strength)
+    seed_button_selector = (
+        '//*[@id="root"]/div/div/div[2]/div/main/div[1]/div/div[1]/form/div/div[6]/div[2]/div/div/div/div/div[1]/div[1]/div[2]/input'
+    )
+    driver.find_element(By.XPATH, seed_button_selector).send_keys(seed)
+    quality_button = driver.find_element(By.ID, "Quality")
+    if quality_button.get_property("aria-checked") == "false":
+        if hd:
+            quality_button.click()  # HD enabled
+    else:
+        if not hd:
+            quality_button.click()  # HD disabled
+
+    submit_button_selector = 'button[type="submit"]'
+    driver.find_element(By.CSS_SELECTOR, submit_button_selector).click()
