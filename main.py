@@ -14,6 +14,7 @@ __version__ = "0.0.0"
 
 import logging
 import os
+from time import sleep
 import re
 from undetected_chromedriver import Chrome, ChromeOptions
 from undetected_edgedriver import Edge, EdgeOptions
@@ -22,6 +23,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
+import pixverse
 
 
 def configure_logging(filename: str = "appdata/script.log") -> None:
@@ -195,22 +197,48 @@ def main() -> None:
 
     # ------------------ Main workflow will start from here ---------------------
     driver = get_webdriver_instance()
-    if not login_to_google_account(driver):
+    if CONFIG["google_login_options_start"]["manual_login"] == "Y":
+        is_login_success = login_to_google_account(driver)
+    else:
+        email = CONFIG["google_login_options_start"]["email"]
+        password = CONFIG["google_login_options_start"]["password"]
+        is_login_success = login_to_google_with_email_and_password(driver, email, password)
+
+    if not is_login_success:
         print("Error: Google login failed. Error Code: 1105")
         logging.error("Google login failed. Error Code: 1105")
         driver.quit()
         return False
 
     option_enabled = False  # Specify if the options are enabled
+    pixverse.login_with_google(driver)
 
     if CONFIG["options_start"]["use_images"] == "Y":
+        logging.info("Initiating video from images...")
         option_enabled = True
-        ...
+        image_path = CONFIG["Default_location_start"]["default_image_location"]
+        motion_strength = CONFIG["video_options_start"]["strength_of_motion"]
+        seed = CONFIG["video_options_start"]["seed"]
+        hd = True if CONFIG["video_options_start"]["HD"] == "Y" else False
+        pixverse.create_video_from_images(driver, image_path, motion_strength, seed, hd)
 
     if CONFIG["options_start"]["use_prompts"] == "Y":
+        logging.info("Initiating video from prompt...")
         option_enabled = True
-        ...
+        prompt_file_location = CONFIG["Default_location_start"]["default_prompt_file_location"]
+        seed = CONFIG["video_options_start"]["seed"]
+        try:
+            with open(prompt_file_location) as file:
+                prompt = file.read()
+        except FileNotFoundError:
+            print("Error: Prompt file not found. Error Code: 1107")
+            logging.error("Prompt file not found. Error Code: 1107")
+        else:
+            pixverse.create_video_from_prompt(driver, prompt, seed=seed)
 
+    sleep(50)
+    print("Operation Completed. Closing the webdriver.")
+    logging.info("Operation Completed. Closing the webdriver.")
     driver.quit()  # Closing the browser
 
     if not option_enabled:
