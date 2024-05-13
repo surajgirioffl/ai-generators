@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 9th May 2024
-Last-modified: 9th May 2024
+Last-modified: 13th May 2024
 Error-series: 1200
 """
 
@@ -13,7 +13,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver import Chrome, Edge
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
-
+from selenium.common.exceptions import TimeoutException
 
 URL = "https://app.pixverse.ai/login"
 
@@ -82,6 +82,22 @@ def create_video_from_images(
     Result:
         None
     """
+
+    def wait_until_image_uploaded() -> bool:
+        """
+        A function that waits until a specific image is uploaded on the webpage and returns True if successful, False otherwise.
+        No parameters are passed to this function and it returns a boolean value.
+        """
+        try:
+            wait.until(
+                expected_conditions.text_to_be_present_in_element_attribute((By.TAG_NAME, "img"), "src", "https://media.pixverse.ai/upload")
+            )
+        except TimeoutException:
+            logging.error("Image not uploaded. Time out. Error Code: 1201")
+            return False
+        else:
+            return True
+
     logging.info("Creating video from images...")
     wait = WebDriverWait(driver, 20)
 
@@ -112,6 +128,10 @@ def create_video_from_images(
     else:
         if not hd:
             quality_button.click()  # HD disabled
+
+    # Waiting for image to be uploaded
+    if not wait_until_image_uploaded():
+        return False
 
     submit_button_selector = 'button[type="submit"]'
     driver.find_element(By.CSS_SELECTOR, submit_button_selector).click()
