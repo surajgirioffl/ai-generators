@@ -16,7 +16,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver import Chrome, Edge
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 URL = "https://app.pixverse.ai/login"
 
@@ -66,8 +66,12 @@ def fetch_generated_video_link(driver: Chrome | Edge | Any) -> str | bool:
     Download last generated video
     - document.querySelectorAll(".text-white.text-base.text-center")
     - Above div is available only when video is generating (not before and not after generating)
-    - document.getElementsByClassName("media-card") will return all generated video including the last one.
-    - use document.getElementsByClassName("media-card")[0] to select the last generated video and click on it.
+    - document.getElementsByClassName("media-card") will return all generated video including the last one (but in random order.)
+    - Now issue is how to identify the latest generated video:
+        - I have found that each div.media-card has an unique attribute named as 'data-id' and it's value is a random unique integer.
+        - Our logic will to store data-id of all div.media-card before generating the video.
+        - After video generation, check all div.media-card. If any div.media-card data-id is not present in the existing list then that will our latest div.media-card containing latest video.
+        - Count div.media-card before video generation and after video-generation and click on the selected div.media-card only if number increased by 1.
     - It will open as full screen (Means only that video and it's contents will visible on the screen).
     - Now use, video_element = document.getElementsByTagName("video")[0] - 0 because tag name returns node list. by the way, the page contains only one video element.
     - OR
@@ -90,6 +94,13 @@ def fetch_generated_video_link(driver: Chrome | Edge | Any) -> str | bool:
             # if no exception
             break
 
+    # Storing the data-id of all existing div.media-card
+    try:
+        media_card_div_list = driver.find_elements(By.CSS_SELECTOR, ".media-card")
+        existing_data_ids = [element.get_attribute("data-id") for element in media_card_div_list]
+    except NoSuchElementException:
+        existing_data_ids = []
+
     # Now, wait until the message div will removed from the DOM because when video will be generated then this div will no longer attached to the DOM.
     wait_300 = WebDriverWait(driver, 600)  # Video generation takes time.
     try:
@@ -99,7 +110,21 @@ def fetch_generated_video_link(driver: Chrome | Edge | Any) -> str | bool:
         logging.log("Video generating taking too much time (10 min+). Error Code: 1202")
         return False
 
-    driver.find_element(By.CSS_SELECTOR, ".media-card").click()
+    while True:
+        new_media_card_div_list = driver.find_elements(By.CSS_SELECTOR, ".media-card")
+        if len(new_media_card_div_list) > len(media_card_div_list):
+            new_data_ids = [element.get_attribute("data-id") for element in new_media_card_div_list]
+            break
+        else:
+            # if generated video is not loaded on the screen.
+            sleep(1)
+
+    # Now searching for the desired media-card which contains the latest generated video
+    for index, data_id in enumerate(new_data_ids):
+        if data_id not in existing_data_ids:
+            new_media_card_div_list[index].click()
+            break
+
     WebDriverWait(driver, 30).until(expected_conditions.visibility_of_element_located((By.TAG_NAME, "video")))
     generated_video_link = driver.find_element(By.TAG_NAME, "video").get_attribute("src")
     driver.get(URL.strip("login"))  # Returning to the dashboard
