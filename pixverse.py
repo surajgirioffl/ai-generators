@@ -2,13 +2,16 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 9th May 2024
-Last-modified: 13th May 2024
+Last-modified: 14th May 2024
 Error-series: 1200
 """
 
 import logging
+import os
 from time import sleep
 from typing import Any
+from datetime import datetime
+import requests
 from selenium.webdriver.common.by import By
 from selenium.webdriver import Chrome, Edge
 from selenium.webdriver.support import expected_conditions
@@ -58,6 +61,7 @@ def create_video_from_prompt(driver: Chrome | Edge | Any, prompt: str, seed: int
     seed_button_selector = 'input[role="spinbutton"]'
     driver.find_element(By.CSS_SELECTOR, seed_button_selector).send_keys(seed)
     submit_button_selector = 'button[type="submit"]'
+    wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, submit_button_selector)))
     driver.find_element(By.CSS_SELECTOR, submit_button_selector).click()
 
 
@@ -134,4 +138,5 @@ def create_video_from_images(
         return False
 
     submit_button_selector = 'button[type="submit"]'
+    wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, submit_button_selector)))
     driver.find_element(By.CSS_SELECTOR, submit_button_selector).click()
