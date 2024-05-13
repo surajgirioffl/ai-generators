@@ -37,6 +37,60 @@ def login_with_google(driver: Chrome | Edge | Any) -> None:
     wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, login_with_google_selector))).click()
 
 
+def fetch_generated_video_link(driver: Chrome | Edge | Any) -> str | bool:
+    """Function to fetch the public link of the generated video.
+
+    Args:
+        driver (Chrome | Edge | Any): The web driver to use for interacting with the webpage.
+
+    Returns:
+        str | bool: The public link of the generated video or False if the video is not generated.
+    """
+
+    """
+    Download last generated video
+    - document.querySelectorAll(".text-white.text-base.text-center")
+    - Above div is available only when video is generating (not before and not after generating)
+    - document.getElementsByClassName("media-card") will return all generated video including the last one.
+    - use document.getElementsByClassName("media-card")[0] to select the last generated video and click on it.
+    - It will open as full screen (Means only that video and it's contents will visible on the screen).
+    - Now use, video_element = document.getElementsByTagName("video")[0] - 0 because tag name returns node list. by the way, the page contains only one video element.
+    - OR
+    - Now use, video_element = document.querySelector("video")
+    - fetch video_element.src, this src is public.
+    - Use requests lib and download the video.
+    """
+    # First waiting and checking if the div specifying the video generation is present or not.
+    wait = WebDriverWait(driver, 3)
+
+    for _ in range(3):
+        try:
+            wait.until(expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, ".text-white.text-base.text-center")))
+        except TimeoutException:
+            # Div is not present means button is clicked.
+            logging.info("Div specifying the video generation is not present. Clicking the submit button again...")
+            submit_button_selector = 'button[type="submit"]'
+            wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, submit_button_selector))).click()
+        else:
+            # if no exception
+            break
+
+    # Now, wait until the message div will removed from the DOM because when video will be generated then this div will no longer attached to the DOM.
+    wait_300 = WebDriverWait(driver, 600)  # Video generation takes time.
+    try:
+        wait_300.until_not(expected_conditions.presence_of_element_located((By.CSS_SELECTOR, ".text-white.text-base.text-center")))
+    except TimeoutException:
+        print("Video generating taking too much time (10 min+). Error Code: 1202")
+        logging.log("Video generating taking too much time (10 min+). Error Code: 1202")
+        return False
+
+    driver.find_element(By.CSS_SELECTOR, ".media-card").click()
+    WebDriverWait(driver, 30).until(expected_conditions.visibility_of_element_located((By.TAG_NAME, "video")))
+    generated_video_link = driver.find_element(By.TAG_NAME, "video").get_attribute("src")
+    driver.get(URL.strip("login"))  # Returning to the dashboard
+    return generated_video_link
+
+
 def create_video_from_prompt(driver: Chrome | Edge | Any, prompt: str, seed: int | str):
     """Creates a video based on a given prompt using the provided driver.
 
