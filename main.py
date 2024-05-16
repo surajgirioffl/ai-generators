@@ -222,6 +222,9 @@ def main() -> None:
         hd = True if CONFIG["video_options_start"]["HD"] == "Y" else False
         pixverse.create_video_from_images(driver, image_path, motion_strength, seed, hd)
 
+        link = pixverse.fetch_generated_video_link(driver)
+        pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
+
     if CONFIG["options_start"]["use_prompts"] == "Y":
         logging.info("Initiating video from prompt...")
         option_enabled = True
@@ -236,7 +239,11 @@ def main() -> None:
         else:
             pixverse.create_video_from_prompt(driver, prompt, seed=seed)
 
-    sleep(50)
+        link = pixverse.fetch_generated_video_link(driver)
+        pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
+
+    sleep(50) 
+
     print("Operation Completed. Closing the webdriver.")
     logging.info("Operation Completed. Closing the webdriver.")
     driver.quit()  # Closing the browser
