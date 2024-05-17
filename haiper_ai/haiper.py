@@ -79,7 +79,7 @@ class Haiper:
             filename (str, optional): The name of the file to save the video as. If not provided, a default filename will be generated.
         """
         if not filename:
-            filename = datetime.now().strftime("pixverse_%Y%m%d%H%M%S.mp4")
+            filename = datetime.now().strftime("haiper_%Y%m%d%H%M%S.mp4")
         response = requests.get(link)
         with open(os.path.join(path, filename), "wb") as file:
             file.write(response.content)
