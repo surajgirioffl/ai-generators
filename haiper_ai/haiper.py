@@ -33,3 +33,21 @@ class Haiper:
         """
         self.driver = driver
         self.wait = WebDriverWait(self.driver, 60)
+
+    def login_with_google(self) -> None:
+        """Function to login to haiper using Google authentication.
+
+        Args:
+            driver (Chrome | Edge | Any): The driver to interact with the browser.
+
+        Returns:
+            None
+        """
+        self.driver.get(URL)
+
+        # Click on the button 'login with Google' when it appears
+        login_with_google_xpath = "/html/body/main/article/section/div/div[1]/div[2]/button[2]"
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, login_with_google_xpath))).click()
+
+        # Wait until login success
+        self.wait.until(EC.url_contains("haiper.ai/explore"))
