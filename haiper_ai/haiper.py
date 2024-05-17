@@ -87,7 +87,8 @@ class Haiper:
             self.wait.until(EC.element_to_be_clickable((By.XPATH, create_video_with_text_div_xpath))).click()
 
             self.driver.find_element(By.TAG_NAME, "textarea").send_keys(prompt)  # Prompt
-            self.driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Creation Setting"]').click()  # Clicking option button
+            option_button = self.driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Creation Setting"]')
+            option_button.click()  # Clicking option button
             self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input[name='seed']"))).send_keys(seed)  # seed
 
             duration_2_sec_button_selector = "button[value='2']"  # default value in haiper
@@ -98,8 +99,9 @@ class Haiper:
                 self.driver.find_element(By.CSS_SELECTOR, duration_2_sec_button_selector).click()
 
             logging.debug("Going to click on the create button.")
-            create_button_xpath = "/html/body/main/article/section/div/div/footer/div/form/div/div[3]/button[3]"
-            self.wait.until(EC.element_to_be_clickable((By.XPATH, create_button_xpath))).click()  # Clicking create button
+            # create_button = option_button.find_element(By.XPATH, "./following-sibling::button[1]")
+            wait = WebDriverWait(option_button, 30)
+            wait.until(EC.element_to_be_clickable((By.XPATH, "./following-sibling::button[1]"))).click()  # Clicking create button
         except Exception as e:
             print("Something went wrong while generating video with prompt. Error Code: 1402")
             logging.error("Something went wrong while generating video with prompt. Error Code: 1402")
@@ -133,7 +135,8 @@ class Haiper:
             if prompt:
                 self.driver.find_element(By.TAG_NAME, "textarea").send_keys(prompt)  # Prompt
 
-            self.driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Creation Setting"]').click()  # Clicking option button
+            option_button = self.driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Creation Setting"]')
+            option_button.click()  # Clicking option button
             self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input[name='seed']"))).send_keys(seed)  # seed
 
             duration_2_sec_button_selector = "button[value='2']"  # default value in haiper
@@ -146,8 +149,10 @@ class Haiper:
             # Waiting until the image uploaded and the submit-button will clickable.
             wait_until_image_uploaded()
 
-            create_button_xpath = "/html/body/main/article/section/div/div/footer/div/form/div/div[3]/button[3]"
-            self.wait.until(EC.element_to_be_clickable((By.XPATH, create_button_xpath))).click()  # Clicking create button
+            logging.debug("Going to click on the create button.")
+            # create_button = option_button.find_element(By.XPATH, "./following-sibling::button[1]")
+            wait = WebDriverWait(option_button, 30)
+            wait.until(EC.element_to_be_clickable((By.XPATH, "./following-sibling::button[1]"))).click()  # Clicking create button
         except Exception as e:
             print("Something went wrong while generating video with image. Error Code: 1403")
             logging.error("Something went wrong while generating video with image. Error Code: 1404")
