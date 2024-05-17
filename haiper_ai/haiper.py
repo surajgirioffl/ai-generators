@@ -43,6 +43,7 @@ class Haiper:
         Returns:
             None
         """
+        logging.info("Login Haiper via Google authentication.")
         self.driver.get(URL)
 
         # Click on the button 'login with Google' when it appears
@@ -50,6 +51,7 @@ class Haiper:
         self.wait.until(EC.element_to_be_clickable((By.XPATH, login_with_google_xpath))).click()
 
         # Account selection is compulsory in haiper
+        logging.info("Selecting Google account.")
         self.wait.until(EC.url_contains("oauthchooseaccount"))  # Wait until account selection page opens
         select_account_div_xpath = (
             '//*[@id="yDmH0d"]/div[1]/div[1]/div[2]/div/div/div[2]/div/div/div[1]/form/span/section/div/div/div/div/ul/li[1]/div'
@@ -58,6 +60,7 @@ class Haiper:
 
         # Wait until login success
         self.wait.until(EC.url_contains("haiper.ai/explore"))
+        logging.info("Login success.")
 
     def create_video_with_prompt(self, prompt: str, seed: str | int, duration: str | int = 2):
         """Create video with the given prompt text, seed value, and optional duration setting.
@@ -67,6 +70,7 @@ class Haiper:
             seed (str | int): The seed value for the video.
             duration (str | int, optional): The duration setting for the video. Defaults to 2 seconds.
         """
+        logging.info("Creating video with the given prompt.")
         create_video_with_text_div_xpath = "/html/body/main/article/section/div/div/div[2]/div[1]/div/div/div/div[1]"
         self.wait.until(EC.element_to_be_clickable((By.XPATH, create_video_with_text_div_xpath))).click()
 
@@ -83,6 +87,7 @@ class Haiper:
 
         create_button_xpath = "/html/body/main/article/section/div/div/footer/div/form/div/div[3]/button[3]"
         self.wait.until(EC.element_to_be_clickable((By.XPATH, create_button_xpath))).click()  # Clicking create button
+        logging.info("Create button clicked. Generating video.")
 
     def create_video_with_image(self, image_path: str, seed: str | int, prompt: str = "", duration: str | int = 2):
         """A function to create a video with an image.
@@ -93,6 +98,7 @@ class Haiper:
             prompt (str, optional): The prompt to be included. Defaults to ""(empty).
             duration (str | int, optional): The duration of the video. Defaults to 2.
         """
+        logging.info("Creating video with the given image.")
 
         def wait_until_image_uploaded():
             """Wait until the image is uploaded by waiting for the presence of the specified CSS selector."""
@@ -121,3 +127,4 @@ class Haiper:
 
         create_button_xpath = "/html/body/main/article/section/div/div/footer/div/form/div/div[3]/button[3]"
         self.wait.until(EC.element_to_be_clickable((By.XPATH, create_button_xpath))).click()  # Clicking create button
+        logging.info("Create button clicked. Generating video.")
