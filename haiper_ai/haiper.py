@@ -127,7 +127,7 @@ class Haiper:
                     break
 
             if container_video_id:
-                video_id = container_video_id.strip(partial_id)
+                video_id = container_video_id.lstrip(partial_id)
                 logging.info("Video ID found.")
             else:
                 logging.critical("Video ID not found. Means video generation info div is not included in any of video_id_containers.")
