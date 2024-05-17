@@ -70,6 +70,20 @@ class Haiper:
             logging.info("Login success.")
             return True
 
+    def download_video(self, link: str, path: str, filename: str = None):
+        """Download a video from the given link and save it to the specified path with an optional filename.
+
+        Args:
+            link (str): The URL of the video to download.
+            path (str): The directory path where the video will be saved.
+            filename (str, optional): The name of the file to save the video as. If not provided, a default filename will be generated.
+        """
+        if not filename:
+            filename = datetime.now().strftime("pixverse_%Y%m%d%H%M%S.mp4")
+        response = requests.get(link)
+        with open(os.path.join(path, filename), "wb") as file:
+            file.write(response.content)
+
     def fetch_generated_video_link(self):
         """A function to fetch the generated video link after a series of actions to locate and retrieve it."""
         logging.info("Started fetching generated video link.")
