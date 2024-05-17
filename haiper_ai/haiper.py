@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 17th May 2024
-Last-modified: 17th May 2024
+Last-modified: 18th May 2024
 Error-series: 1400
 """
 
@@ -69,6 +69,62 @@ class Haiper:
         else:
             logging.info("Login success.")
             return True
+
+    def fetch_generated_video_link(self):
+        """A function to fetch the generated video link after a series of actions to locate and retrieve it."""
+        logging.info("Started fetching generated video link.")
+        try:
+            # When submit button is clicked then url changes to 'creation page url' in few seconds.
+            self.wait.until(EC.url_contains("haiper.ai/creations"))
+        except Exception as e:
+            print("Failed to fetch generated video link. Error Code: 1405")
+            logging.error("Failed to fetch generated video link. Error Code: 1405")
+            logging.info("Probably submit button is not clicked.")
+            logging.exception(f"Exception: {str(e)}")
+        else:
+            logging.info("URL changes to haiper.ai/creations")
+            sleep(2)
+            wait = WebDriverWait(self.driver, 800)
+
+            logging.info("Finding all containers with video ID.")
+            # Wait until the generating/queuing message removed from the DOM.
+            partial_id = "creation-card-"
+            # video_id_containers = self.driver.find_elements(By.XPATH, f'//*[contains(@id, "{partial_id}")]') # Working
+            video_id_containers = self.driver.find_elements(By.CSS_SELECTOR, "div[id*=creation-card-]")
+
+            try:
+                video_generating_info_div = self.wait.until(
+                    EC.presence_of_element_located((By.XPATH, '//div[text()="Queuing for generation"]'))
+                )
+            except Exception:
+                video_generating_info_div = self.wait.until(
+                    EC.presence_of_element_located((By.XPATH, '//div[text()="Your video is being generated"]'))
+                )
+            else:
+                video_generating_info_div = wait.until(
+                    EC.presence_of_element_located((By.XPATH, '//div[text()="Your video is being generated"]'))
+                )
+            logging.info("Video generation info div is located.")
+
+            container_video_id = None
+            for container in video_id_containers:
+                if video_generating_info_div in container.find_elements(By.TAG_NAME, "div"):
+                    container_video_id = container.get_attribute("id")
+                    break
+
+            if container_video_id:
+                video_id = container_video_id.strip(partial_id)
+                logging.info("Video ID found.")
+            else:
+                logging.critical("Video ID not found. Means video generation info div is not included in any of video_id_containers.")
+
+            # Wait until video generation is in process.
+            wait.until_not(EC.presence_of_element_located((By.XPATH, '//div[text()="Your video is being generated"]')))
+
+            self.driver.get(f"https://haiper.ai/creation/{video_id}")  # Opening the video page
+            mp4_link = self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "video"))).get_attribute("src")
+            self.driver.get("https://haiper.ai/explore")  # Opening the explore page
+            return mp4_link
 
     def create_video_with_prompt(self, prompt: str, seed: str | int, duration: str | int = 2):
         """Create video with the given prompt text, seed value, and optional duration setting.
