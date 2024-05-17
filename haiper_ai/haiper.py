@@ -9,7 +9,7 @@ Error-series: 1400
 import logging
 import os
 from time import sleep
-from typing import Any
+from typing import Any, Literal
 from datetime import datetime
 import requests
 from selenium.webdriver.common.by import By
@@ -84,8 +84,12 @@ class Haiper:
         with open(os.path.join(path, filename), "wb") as file:
             file.write(response.content)
 
-    def fetch_generated_video_link(self):
-        """A function to fetch the generated video link after a series of actions to locate and retrieve it."""
+    def fetch_generated_video_link(self) -> str | Literal[False]:
+        """A function to fetch the generated video link after a series of actions to locate and retrieve it.
+
+        Returns:
+            str | Literal[False] - Returns the generated link on success or False in case of any error/exception.
+        """
         logging.info("Started fetching generated video link.")
         try:
             # When submit button is clicked then url changes to 'creation page url' in few seconds.
@@ -130,10 +134,18 @@ class Haiper:
                 video_id = container_video_id.lstrip(partial_id)
                 logging.info("Video ID found.")
             else:
+                print("Video ID not found. Error Code: 1406")
+                logging.error("Video ID not found. Error Code: 1406")
                 logging.critical("Video ID not found. Means video generation info div is not included in any of video_id_containers.")
+                return False
 
-            # Wait until video generation is in process.
-            wait.until_not(EC.presence_of_element_located((By.XPATH, '//div[text()="Your video is being generated"]')))
+            try:
+                # Wait until video generation is in process.
+                wait.until_not(EC.presence_of_element_located((By.XPATH, '//div[text()="Your video is being generated"]')))
+            except TimeoutException:
+                print("Video generating taking too much time (10 min+). Error Code: 1407")
+                logging.exception("Video generating taking too much time (10 min+). Error Code: 1407")
+                return False
 
             self.driver.get(f"https://haiper.ai/creation/{video_id}")  # Opening the video page
             mp4_link = self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "video"))).get_attribute("src")
