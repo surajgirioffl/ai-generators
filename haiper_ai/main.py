@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 17th May 2024
-Last-modified: 17th May 2024
+Last-modified: 18th May 2024
 Error-series: 1300
 """
 
@@ -23,7 +23,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
-import haiper
+from haiper import Haiper
 
 PROJECT_DIR = os.path.dirname(__file__)
 os.chdir(PROJECT_DIR)  # Changing the current working directory to the project directory.
@@ -200,6 +200,7 @@ def main() -> None:
 
     # ------------------ Main workflow will start from here ---------------------
     driver = get_webdriver_instance()
+    driver.maximize_window()
     if CONFIG["google_login_options_start"]["manual_login"] == "Y":
         is_login_success = login_to_google_account(driver)
     else:
@@ -214,19 +215,35 @@ def main() -> None:
         return False
 
     option_enabled = False  # Specify if the options are enabled
-    # pixverse.login_with_google(driver)
+
+    # Creating instance of the Haiper class
+    haiper = Haiper(driver)
+    haiper.login_with_google()
 
     if CONFIG["options_start"]["use_prompts"] == "Y":
-        logging.info("Initiating video from prompt...")
+        logging.info("Initiating video generation from prompt...")
         option_enabled = True
-        ...
+        seed = CONFIG["video_options_start"]["seed"]
+        duration = CONFIG["video_options_start"]["duration"]
+        prompt_file_location = CONFIG["Default_location_start"]["default_prompt_file_location"]
+        seed = CONFIG["video_options_start"]["seed"]
+        try:
+            with open(prompt_file_location) as file:
+                prompt = file.read()
+        except FileNotFoundError as e:
+            print("Error: Prompt file not found. Error Code: 1307")
+            logging.error("Prompt file not found. Error Code: 1307")
+            logging.error(f"Exception: {e}")
+        else:
+            haiper.create_video_with_prompt(prompt, seed, duration)
+            haiper.download_video(haiper.fetch_generated_video_link(), CONFIG["Default_location_start"]["default_output_location_local"])
 
     if CONFIG["options_start"]["use_images"] == "Y":
-        logging.info("Initiating video from images...")
+        logging.info("Initiating video generation from images...")
         option_enabled = True
         ...
 
-    sleep(50)
+    sleep(5000)
 
     print("Operation Completed. Closing the webdriver.")
     logging.info("Operation Completed. Closing the webdriver.")
