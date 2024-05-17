@@ -3,13 +3,13 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 7th May 2024
-Last-modified: 12th May 2024
+Last-modified: 17th May 2024
 Error-series: 1100
 """
 
 __author__ = "Suraj Kumar Giri"
 __email__ = "surajgirioffl@gmail.com"
-__version__ = "0.0.0"
+__version__ = "1.0.0"
 
 
 import logging
@@ -24,6 +24,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
 import pixverse
+
+PROJECT_DIR = os.path.dirname(__file__)
+os.chdir(PROJECT_DIR)  # Changing the current working directory to the project directory.
 
 
 def configure_logging(filename: str = "appdata/script.log") -> None:
@@ -242,7 +245,7 @@ def main() -> None:
         link = pixverse.fetch_generated_video_link(driver)
         pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
 
-    sleep(50) 
+    sleep(50)
 
     print("Operation Completed. Closing the webdriver.")
     logging.info("Operation Completed. Closing the webdriver.")
