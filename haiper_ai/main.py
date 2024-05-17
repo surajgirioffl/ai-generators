@@ -241,7 +241,11 @@ def main() -> None:
     if CONFIG["options_start"]["use_images"] == "Y":
         logging.info("Initiating video generation from images...")
         option_enabled = True
-        ...
+        image_path = CONFIG["Default_location_start"]["default_image_location"]
+        seed = CONFIG["video_options_start"]["seed"]
+        duration = CONFIG["video_options_start"]["duration"]
+        haiper.create_video_with_image(image_path, seed, duration=duration)
+        haiper.download_video(haiper.fetch_generated_video_link(), CONFIG["Default_location_start"]["default_output_location_local"])
 
     sleep(5000)
 
