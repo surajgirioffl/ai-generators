@@ -88,14 +88,14 @@ class Haiper:
 
             self.driver.find_element(By.TAG_NAME, "textarea").send_keys(prompt)  # Prompt
             self.driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Creation Setting"]').click()  # Clicking option button
-            self.wait.until(EC.visibility_of_element_located((By.ID, ":r5j:"))).send_keys(seed)  # seed
+            self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input[name='seed']"))).send_keys(seed)  # seed
 
-            duration_2_sec_button_id = ":rbf:"  # default value in haiper
-            duration_4_sec_button_id = ":rbh:"
+            duration_2_sec_button_selector = "button[value='2']"  # default value in haiper
+            duration_4_sec_button_selector = "button[value='4']"
             if str(duration) == "4":
-                self.driver.find_element(value=duration_4_sec_button_id).click()
+                self.driver.find_element(By.CSS_SELECTOR, duration_4_sec_button_selector).click()
             else:
-                self.driver.find_element(value=duration_2_sec_button_id).click()
+                self.driver.find_element(By.CSS_SELECTOR, duration_2_sec_button_selector).click()
 
             logging.debug("Going to click on the create button.")
             create_button_xpath = "/html/body/main/article/section/div/div/footer/div/form/div/div[3]/button[3]"
@@ -134,14 +134,14 @@ class Haiper:
                 self.driver.find_element(By.TAG_NAME, "textarea").send_keys(prompt)  # Prompt
 
             self.driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Creation Setting"]').click()  # Clicking option button
-            self.wait.until(EC.visibility_of_element_located((By.ID, ":r5r:"))).send_keys(seed)
+            self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input[name='seed']"))).send_keys(seed)  # seed
 
-            duration_2_sec_button_id = ":r5t:"  # default value in haiper
-            duration_4_sec_button_id = ":r5v:__label"
+            duration_2_sec_button_selector = "button[value='2']"  # default value in haiper
+            duration_4_sec_button_selector = "button[value='4']"
             if str(duration) == "4":
-                self.driver.find_element(value=duration_4_sec_button_id).click()
+                self.driver.find_element(By.CSS_SELECTOR, duration_4_sec_button_selector).click()
             else:
-                self.driver.find_element(value=duration_2_sec_button_id).click()
+                self.driver.find_element(By.CSS_SELECTOR, duration_2_sec_button_selector).click()
 
             # Waiting until the image uploaded and the submit-button will clickable.
             wait_until_image_uploaded()
