@@ -49,5 +49,12 @@ class Haiper:
         login_with_google_xpath = "/html/body/main/article/section/div/div[1]/div[2]/button[2]"
         self.wait.until(EC.element_to_be_clickable((By.XPATH, login_with_google_xpath))).click()
 
+        # Account selection is compulsory in haiper
+        self.wait.until(EC.url_contains("oauthchooseaccount"))  # Wait until account selection page opens
+        select_account_div_xpath = (
+            '//*[@id="yDmH0d"]/div[1]/div[1]/div[2]/div/div/div[2]/div/div/div[1]/form/span/section/div/div/div/div/ul/li[1]/div'
+        )
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, select_account_div_xpath))).click()
+
         # Wait until login success
         self.wait.until(EC.url_contains("haiper.ai/explore"))
