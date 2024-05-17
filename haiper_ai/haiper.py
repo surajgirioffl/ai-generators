@@ -58,3 +58,28 @@ class Haiper:
 
         # Wait until login success
         self.wait.until(EC.url_contains("haiper.ai/explore"))
+
+    def create_video_with_prompt(self, prompt: str, seed: str | int, duration: str | int = 2):
+        """Create video with the given prompt text, seed value, and optional duration setting.
+
+        Parameters:
+            prompt (str): The text prompt for the video.
+            seed (str | int): The seed value for the video.
+            duration (str | int, optional): The duration setting for the video. Defaults to 2 seconds.
+        """
+        create_video_with_text_div_xpath = "/html/body/main/article/section/div/div/div[2]/div[1]/div/div/div/div[1]"
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, create_video_with_text_div_xpath))).click()
+
+        self.driver.find_element(By.TAG_NAME, "textarea").send_keys(prompt)  # Prompt
+        self.driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Creation Setting"]').click()  # Clicking option button
+        self.wait.until(EC.visibility_of_element_located((By.ID, ":rbd:"))).send_keys(seed)  # seed
+
+        duration_2_sec_button_id = ":rbf:"  # default value in haiper
+        duration_4_sec_button_id = ":rbh:"
+        if str(duration) == "4":
+            self.driver.find_element(value=duration_4_sec_button_id).click()
+        else:
+            self.driver.find_element(value=duration_2_sec_button_id).click()
+
+        create_button_xpath = "/html/body/main/article/section/div/div/footer/div/form/div/div[3]/button[3]"
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, create_button_xpath))).click()  # Clicking create button
