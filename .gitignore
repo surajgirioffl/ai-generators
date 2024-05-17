@@ -4,3 +4,5 @@ appdata/
 *.txt
 *.mp4
 __pycache__/
+images/
+output/
