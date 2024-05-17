@@ -64,7 +64,7 @@ class Haiper:
         except Exception as e:
             print("Login failed. Error Code: 1401")
             logging.error("Login failed. Error Code: 1401")
-            logging.error(f"Exception: {e}")
+            logging.exception(f"Exception: {e}")
             return False
         else:
             logging.info("Login success.")
@@ -88,7 +88,7 @@ class Haiper:
 
             self.driver.find_element(By.TAG_NAME, "textarea").send_keys(prompt)  # Prompt
             self.driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Creation Setting"]').click()  # Clicking option button
-            self.wait.until(EC.visibility_of_element_located((By.ID, ":rbd:"))).send_keys(seed)  # seed
+            self.wait.until(EC.visibility_of_element_located((By.ID, ":r5j:"))).send_keys(seed)  # seed
 
             duration_2_sec_button_id = ":rbf:"  # default value in haiper
             duration_4_sec_button_id = ":rbh:"
@@ -97,12 +97,13 @@ class Haiper:
             else:
                 self.driver.find_element(value=duration_2_sec_button_id).click()
 
+            logging.debug("Going to click on the create button.")
             create_button_xpath = "/html/body/main/article/section/div/div/footer/div/form/div/div[3]/button[3]"
             self.wait.until(EC.element_to_be_clickable((By.XPATH, create_button_xpath))).click()  # Clicking create button
         except Exception as e:
             print("Something went wrong while generating video with prompt. Error Code: 1402")
             logging.error("Something went wrong while generating video with prompt. Error Code: 1402")
-            logging.error(f"Exception: {e}")
+            logging.exception(f"Exception: {e}")
             return False
         else:
             logging.info("Create button clicked. Generating video.")
@@ -150,7 +151,7 @@ class Haiper:
         except Exception as e:
             print("Something went wrong while generating video with image. Error Code: 1403")
             logging.error("Something went wrong while generating video with image. Error Code: 1404")
-            logging.error(f"Exception: {e}")
+            logging.exception(f"Exception: {e}")
             return False
         else:
             logging.info("Create button clicked. Generating video.")
