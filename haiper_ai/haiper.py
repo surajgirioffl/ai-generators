@@ -34,33 +34,41 @@ class Haiper:
         self.driver = driver
         self.wait = WebDriverWait(self.driver, 60)
 
-    def login_with_google(self) -> None:
+    def login_with_google(self) -> bool:
         """Function to login to haiper using Google authentication.
 
         Args:
             driver (Chrome | Edge | Any): The driver to interact with the browser.
 
         Returns:
-            None
+            bool: True if login is successful, False otherwise.
         """
         logging.info("Login Haiper via Google authentication.")
         self.driver.get(URL)
 
-        # Click on the button 'login with Google' when it appears
-        login_with_google_xpath = "/html/body/main/article/section/div/div[1]/div[2]/button[2]"
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, login_with_google_xpath))).click()
+        try:
+            # Click on the button 'login with Google' when it appears
+            login_with_google_xpath = "/html/body/main/article/section/div/div[1]/div[2]/button[2]"
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, login_with_google_xpath))).click()
 
-        # Account selection is compulsory in haiper
-        logging.info("Selecting Google account.")
-        self.wait.until(EC.url_contains("oauthchooseaccount"))  # Wait until account selection page opens
-        select_account_div_xpath = (
-            '//*[@id="yDmH0d"]/div[1]/div[1]/div[2]/div/div/div[2]/div/div/div[1]/form/span/section/div/div/div/div/ul/li[1]/div'
-        )
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, select_account_div_xpath))).click()
+            # Account selection is compulsory in haiper
+            logging.info("Selecting Google account.")
+            self.wait.until(EC.url_contains("oauthchooseaccount"))  # Wait until account selection page opens
+            select_account_div_xpath = (
+                '//*[@id="yDmH0d"]/div[1]/div[1]/div[2]/div/div/div[2]/div/div/div[1]/form/span/section/div/div/div/div/ul/li[1]/div'
+            )
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, select_account_div_xpath))).click()
 
-        # Wait until login success
-        self.wait.until(EC.url_contains("haiper.ai/explore"))
-        logging.info("Login success.")
+            # Wait until login success
+            self.wait.until(EC.url_contains("haiper.ai/explore"))
+        except Exception as e:
+            print("Login failed. Error Code: 1401")
+            logging.error("Login failed. Error Code: 1401")
+            logging.error(f"Exception: {e}")
+            return False
+        else:
+            logging.info("Login success.")
+            return True
 
     def create_video_with_prompt(self, prompt: str, seed: str | int, duration: str | int = 2):
         """Create video with the given prompt text, seed value, and optional duration setting.
@@ -69,25 +77,36 @@ class Haiper:
             prompt (str): The text prompt for the video.
             seed (str | int): The seed value for the video.
             duration (str | int, optional): The duration setting for the video. Defaults to 2 seconds.
+
+        Returns:
+            bool: True if video creation is successful, False otherwise.
         """
         logging.info("Creating video with the given prompt.")
-        create_video_with_text_div_xpath = "/html/body/main/article/section/div/div/div[2]/div[1]/div/div/div/div[1]"
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, create_video_with_text_div_xpath))).click()
+        try:
+            create_video_with_text_div_xpath = "/html/body/main/article/section/div/div/div[2]/div[1]/div/div/div/div[1]"
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, create_video_with_text_div_xpath))).click()
 
-        self.driver.find_element(By.TAG_NAME, "textarea").send_keys(prompt)  # Prompt
-        self.driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Creation Setting"]').click()  # Clicking option button
-        self.wait.until(EC.visibility_of_element_located((By.ID, ":rbd:"))).send_keys(seed)  # seed
+            self.driver.find_element(By.TAG_NAME, "textarea").send_keys(prompt)  # Prompt
+            self.driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Creation Setting"]').click()  # Clicking option button
+            self.wait.until(EC.visibility_of_element_located((By.ID, ":rbd:"))).send_keys(seed)  # seed
 
-        duration_2_sec_button_id = ":rbf:"  # default value in haiper
-        duration_4_sec_button_id = ":rbh:"
-        if str(duration) == "4":
-            self.driver.find_element(value=duration_4_sec_button_id).click()
+            duration_2_sec_button_id = ":rbf:"  # default value in haiper
+            duration_4_sec_button_id = ":rbh:"
+            if str(duration) == "4":
+                self.driver.find_element(value=duration_4_sec_button_id).click()
+            else:
+                self.driver.find_element(value=duration_2_sec_button_id).click()
+
+            create_button_xpath = "/html/body/main/article/section/div/div/footer/div/form/div/div[3]/button[3]"
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, create_button_xpath))).click()  # Clicking create button
+        except Exception as e:
+            print("Something went wrong while generating video with prompt. Error Code: 1402")
+            logging.error("Something went wrong while generating video with prompt. Error Code: 1402")
+            logging.error(f"Exception: {e}")
+            return False
         else:
-            self.driver.find_element(value=duration_2_sec_button_id).click()
-
-        create_button_xpath = "/html/body/main/article/section/div/div/footer/div/form/div/div[3]/button[3]"
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, create_button_xpath))).click()  # Clicking create button
-        logging.info("Create button clicked. Generating video.")
+            logging.info("Create button clicked. Generating video.")
+            return True
 
     def create_video_with_image(self, image_path: str, seed: str | int, prompt: str = "", duration: str | int = 2):
         """A function to create a video with an image.
@@ -104,27 +123,35 @@ class Haiper:
             """Wait until the image is uploaded by waiting for the presence of the specified CSS selector."""
             self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "img[alt='thumbnail']")))
 
-        animate_your_image_div_xpath = "/html/body/main/article/section/div/div/div[2]/div[1]/div/div/div/div[2]"
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, animate_your_image_div_xpath))).click()
+        try:
+            animate_your_image_div_xpath = "/html/body/main/article/section/div/div/div[2]/div[1]/div/div/div/div[2]"
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, animate_your_image_div_xpath))).click()
 
-        # Image upload
-        self.driver.find_element(By.CSS_SELECTOR, 'input[type="file"]').send_keys(image_path)
-        if prompt:
-            self.driver.find_element(By.TAG_NAME, "textarea").send_keys(prompt)  # Prompt
+            # Image upload
+            self.driver.find_element(By.CSS_SELECTOR, 'input[type="file"]').send_keys(image_path)
+            if prompt:
+                self.driver.find_element(By.TAG_NAME, "textarea").send_keys(prompt)  # Prompt
 
-        self.driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Creation Setting"]').click()  # Clicking option button
-        self.wait.until(EC.visibility_of_element_located((By.ID, ":r5r:"))).send_keys(seed)
+            self.driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Creation Setting"]').click()  # Clicking option button
+            self.wait.until(EC.visibility_of_element_located((By.ID, ":r5r:"))).send_keys(seed)
 
-        duration_2_sec_button_id = ":r5t:"  # default value in haiper
-        duration_4_sec_button_id = ":r5v:__label"
-        if str(duration) == "4":
-            self.driver.find_element(value=duration_4_sec_button_id).click()
+            duration_2_sec_button_id = ":r5t:"  # default value in haiper
+            duration_4_sec_button_id = ":r5v:__label"
+            if str(duration) == "4":
+                self.driver.find_element(value=duration_4_sec_button_id).click()
+            else:
+                self.driver.find_element(value=duration_2_sec_button_id).click()
+
+            # Waiting until the image uploaded and the submit-button will clickable.
+            wait_until_image_uploaded()
+
+            create_button_xpath = "/html/body/main/article/section/div/div/footer/div/form/div/div[3]/button[3]"
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, create_button_xpath))).click()  # Clicking create button
+        except Exception as e:
+            print("Something went wrong while generating video with image. Error Code: 1403")
+            logging.error("Something went wrong while generating video with image. Error Code: 1404")
+            logging.error(f"Exception: {e}")
+            return False
         else:
-            self.driver.find_element(value=duration_2_sec_button_id).click()
-
-        # Waiting until the image uploaded and the submit-button will clickable.
-        wait_until_image_uploaded()
-
-        create_button_xpath = "/html/body/main/article/section/div/div/footer/div/form/div/div[3]/button[3]"
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, create_button_xpath))).click()  # Clicking create button
-        logging.info("Create button clicked. Generating video.")
+            logging.info("Create button clicked. Generating video.")
+            return True
