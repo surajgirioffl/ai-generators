@@ -33,3 +33,31 @@ class Ideogram:
         """
         self.driver = driver
         self.wait = WebDriverWait(self.driver, 60)
+
+    def login_with_google(self) -> bool:
+        """Function to login to ideogram using Google authentication.
+
+        Args:
+            driver (Chrome | Edge | Any): The driver to interact with the browser.
+
+        Returns:
+            bool: True if login is successful, False otherwise.
+        """
+        logging.info("Login Ideogram via Google authentication.")
+        self.driver.get(URL)
+
+        try:
+            # Click on the button 'login with Google' when it appears
+            login_with_google_xpath = '//*[@id="root"]/div[1]/div/div[3]/button[1]'
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, login_with_google_xpath))).click()
+
+            # Wait until login success
+            self.wait.until(EC.url_contains("ideogram.ai/t/top/1"))
+        except Exception as e:
+            print("Login failed. Error Code: 1601")
+            logging.error("Login failed. Error Code: 1601")
+            logging.exception(f"Exception: {e}")
+            return False
+        else:
+            logging.info("Login success.")
+            return True
