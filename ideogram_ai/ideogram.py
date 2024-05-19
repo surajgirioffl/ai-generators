@@ -61,3 +61,31 @@ class Ideogram:
         else:
             logging.info("Login success.")
             return True
+
+    def create_image_with_prompt(self, prompt: str):
+        """Function that creates an image with the provided prompt.
+
+        Args:
+            prompt (str): The prompt text to be used for generating the image.
+
+        Returns:
+            None
+        """
+        wait = WebDriverWait(self.driver, 10)
+
+        try:
+            logging.info("Trying to fetch the textarea element.")
+            prompt_textarea_selector = 'textarea:read-write[placeholder="What do you want to create?"]'
+            textarea = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, prompt_textarea_selector)))
+            logging.info("Textarea element found. Screen size is greater than 900px")
+        except TimeoutException:
+            logging.info("Textarea element not found. Screen size is less than 900px. Retrying after click on + icon.")
+            # Below svg is visible only when screen width is less than 900 px. And after clicking on this only text area is visible.
+            wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'svg[data-testid="AddIcon"]'))).click()
+            textarea = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, prompt_textarea_selector)))
+            logging.info("Textarea element found. Screen size is less than 900px")
+        else:
+            textarea.send_keys(prompt)
+
+        # Clicking on the generate button
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//button[text()="Generate"]'))).click()
