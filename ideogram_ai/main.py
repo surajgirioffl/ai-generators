@@ -87,13 +87,13 @@ def parse_config_file(file_path: str = "config.txt", set_as_global: bool = True)
                         value = key_value_match.group(2).strip()
                         config_dict[current_section][key] = value
     except FileNotFoundError as e:
-        print(f"Error: File '{file_path}' not found. Error Code: 1301")
-        logging.error(f"Error: File '{file_path}' not found. Error Code: 1301")
+        print(f"Error: File '{file_path}' not found. Error Code: 1501")
+        logging.error(f"Error: File '{file_path}' not found. Error Code: 1501")
         logging.error(f"Exception: {e}")
         return False
     except Exception as e:
-        print("Error: Something went wrong while parsing config file. Error Code: 1302")
-        logging.error("Error: Something went wrong while parsing config file. Error Code: 1302")
+        print("Error: Something went wrong while parsing config file. Error Code: 1502")
+        logging.error("Error: Something went wrong while parsing config file. Error Code: 1502")
         logging.error(f"Exception: {e}")
         return False
     else:
@@ -124,8 +124,8 @@ def get_webdriver_instance(browser: str = "chrome", headless=False) -> Chrome | 
             options.add_argument("--headless")
         return Edge(options=options)
     else:
-        print("Browser not supported. Please use Chrome or Edge. Error Code: 1304")
-        logging.info("Browser not supported. Please use Chrome or Edge. Error Code: 1304")
+        print("Browser not supported. Please use Chrome or Edge. Error Code: 1504")
+        logging.info("Browser not supported. Please use Chrome or Edge. Error Code: 1504")
         return None
 
 
@@ -177,9 +177,9 @@ def login_to_google_with_email_and_password(
 
     except Exception as e:
         print(f"Exception: {e}")
-        print("Google login failed by email and password. Error Code: 1306")
+        print("Google login failed by email and password. Error Code: 1506")
         logging.error(f"Exception: {e}")
-        logging.error("Google login failed by email and password. Error Code: 1306")
+        logging.error("Google login failed by email and password. Error Code: 1506")
         logging.info("Please login manually...")
         return False
     else:
