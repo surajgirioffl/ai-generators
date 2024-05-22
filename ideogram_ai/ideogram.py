@@ -157,7 +157,7 @@ class Ideogram:
             links.append(link)
         # print(links)
         logging.info("Fetched all images links successfully.")
-        return links
+        return list(set(links))
 
     def create_image_with_prompt(self, prompt: str):
         """Function that creates an image with the provided prompt.
