@@ -53,7 +53,9 @@ class Ideogram:
             self.wait.until(EC.element_to_be_clickable((By.XPATH, login_with_google_xpath))).click()
 
             # Wait until login success
-            self.wait.until(EC.url_contains("ideogram.ai/t/top/1"))
+            self.wait.until(
+                EC.url_contains("ideogram.ai/t/")
+            )  # Link may be "https://ideogram.ai/t/top/1" or  https://ideogram.ai/t/explore
         except Exception as e:
             print("Login failed. Error Code: 1601")
             logging.error("Login failed. Error Code: 1601")
