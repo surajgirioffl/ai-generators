@@ -63,6 +63,40 @@ class Ideogram:
             logging.info("Login success.")
             return True
 
+    def fetch_images_link(self, prompt: str) -> list:
+        logging.info("Fetching images links...")
+        wait = WebDriverWait(self.driver, 300)
+        # Wait until the paragraph contents changes to "Generation completed"
+        print("waiting for generation to complete...")
+        wait.until(
+            EC.text_to_be_present_in_element(
+                (By.CSS_SELECTOR, "p.MuiTypography-root.MuiTypography-body1.css-vsgu40"), "Generation completed"
+            )
+        )
+        print("Generation completed.")
+        links = []
+        prompt = prompt.strip().strip(".").replace(" ", "_")
+        if len(prompt) > 40:
+            prompt = prompt[:40]
+        request_response_div = self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, f"div[data-download-name*='{prompt}']")))
+        data_request_id = request_response_div.get_attribute("data-request-id")
+        print(data_request_id)
+        image_page_link = f"https://ideogram.ai/g/{data_request_id}/0"  # 0 or 1 or 2 or 3 or 4 (because 4 images are generated)
+        self.driver.get(image_page_link)
+        self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'img[src*="/api"]')))
+        images = self.driver.find_elements(By.CSS_SELECTOR, 'img[src*="/api"]')
+        print(f"images: {images}")
+        for image in images:
+            link = image.get_attribute("src")
+            print(link)
+            if link.endswith(".png"):
+                # There are 4 images to be fetched but 5 images are returned by the above selector because one image is current page image and it only contains src with .png.
+                # So, we skip this page specific image. BTW in rest 4, this image is also including with .jpg src.
+                continue
+            links.append(link)
+        print(links)
+        return links
+
     def create_image_with_prompt(self, prompt: str):
         """Function that creates an image with the provided prompt.
 
