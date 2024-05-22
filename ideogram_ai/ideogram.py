@@ -134,7 +134,7 @@ class Ideogram:
                 (By.CSS_SELECTOR, "p.MuiTypography-root.MuiTypography-body1.css-vsgu40"), "Generation completed"
             )
         )
-        logging("Generation completed.")
+        logging.info("Generation completed.")
         links = []
         prompt = prompt.strip().strip(".").replace(" ", "_")
         if len(prompt) > 40:
