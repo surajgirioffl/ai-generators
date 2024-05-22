@@ -64,6 +64,13 @@ class Ideogram:
             return True
 
     def download_images(self, links: list[str], path: str, filenames: list[str] = None):
+        """Download images from a list of links to the specified path with optional custom filenames.
+
+        Parameters:
+            links (list[str]): A list of URLs pointing to the images to be downloaded.
+            path (str): The local directory path where the images will be saved.
+            filenames (list[str], optional): A list of custom filenames corresponding to the downloaded images. Defaults to None.
+        """
         print("started downloading")
         headers = {
             "authority": "ideogram.ai",
@@ -106,6 +113,14 @@ class Ideogram:
                         print("retry")
 
     def fetch_images_link(self, prompt: str) -> list:
+        """A function to fetch generated image links.
+
+        Parameters:
+            prompt (str): The prompt string that has been used to generate the images.
+
+        Returns:
+            list: A list of image links fetched based on the prompt.
+        """
         logging.info("Fetching images links...")
         wait = WebDriverWait(self.driver, 300)
         # Wait until the paragraph contents changes to "Generation completed"
