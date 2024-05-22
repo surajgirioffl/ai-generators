@@ -115,7 +115,6 @@ def get_webdriver_instance(browser: str = "chrome", headless=False) -> Chrome | 
     """
     if browser == "chrome":
         options = ChromeOptions()
-        options.add_argument(f"--user-data-dir={PROJECT_DIR}/profile")
         if headless:
             options.add_argument("--headless")
         return Chrome(options=options)
@@ -202,24 +201,24 @@ def main() -> None:
     # ------------------ Main workflow will start from here ---------------------
     driver = get_webdriver_instance()
     driver.maximize_window()
-    # if CONFIG["google_login_options_start"]["manual_login"] == "Y":
-    #     is_login_success = login_to_google_account(driver)
-    # else:
-    #     email = CONFIG["google_login_options_start"]["email"]
-    #     password = CONFIG["google_login_options_start"]["password"]
-    #     is_login_success = login_to_google_with_email_and_password(driver, email, password)
+    if CONFIG["google_login_options_start"]["manual_login"] == "Y":
+        is_login_success = login_to_google_account(driver)
+    else:
+        email = CONFIG["google_login_options_start"]["email"]
+        password = CONFIG["google_login_options_start"]["password"]
+        is_login_success = login_to_google_with_email_and_password(driver, email, password)
 
-    # if not is_login_success:
-    #     print("Error: Google login failed. Error Code: 1505")
-    #     logging.error("Google login failed. Error Code: 1505")
-    #     driver.quit()
-    #     return False
+    if not is_login_success:
+        print("Error: Google login failed. Error Code: 1505")
+        logging.error("Google login failed. Error Code: 1505")
+        driver.quit()
+        return False
 
     option_enabled = False  # Specify if the options are enabled
 
     # Creating instance of the Ideogram class
     ideogram = Ideogram(driver)
-    # ideogram.login_with_google()
+    ideogram.login_with_google()
 
     if CONFIG["options_start"]["use_prompts"] == "Y":
         logging.info("Initiating image generation from prompt...")
