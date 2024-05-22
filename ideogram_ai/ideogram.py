@@ -171,7 +171,9 @@ class Ideogram:
             None
         """
         logging.info("Creating image with prompt...")
-        self.driver.get("https://ideogram.ai/t/top/1")
+        if "ideogram.ai/t/" not in self.driver.current_url:
+            logging.info("Navigating to ideogram.ai/t/top/1")
+            self.driver.get("https://ideogram.ai/t/top/1")
 
         screen_width = self.driver.execute_script("return window.innerWidth")
         if screen_width >= 900:
