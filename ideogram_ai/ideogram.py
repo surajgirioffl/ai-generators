@@ -71,7 +71,7 @@ class Ideogram:
             path (str): The local directory path where the images will be saved.
             filenames (list[str], optional): A list of custom filenames corresponding to the downloaded images. Defaults to None.
         """
-        print("started downloading")
+        logging.info("Downloading started...")
         headers = {
             "authority": "ideogram.ai",
             "method": "GET",
@@ -99,7 +99,7 @@ class Ideogram:
             else:
                 filename = filenames[index]
 
-            headers["path"] = link.lstrip("https://ideogram.ai")
+            headers["path"] = link.lstrip("https://ideogram.ai")  # This is one of the header
 
             while True:
                 with requests.Session() as session:
@@ -110,7 +110,9 @@ class Ideogram:
                             file.write(response.content)
                             break
                     else:
-                        print("retry")
+                        # In case of error, retry. Means that the response content is not an image.
+                        logging.error("Response content is not an image. Retrying...")
+        logging.info("Download completed.")
 
     def fetch_images_link(self, prompt: str) -> list:
         """A function to fetch generated image links.
@@ -124,25 +126,27 @@ class Ideogram:
         logging.info("Fetching images links...")
         wait = WebDriverWait(self.driver, 300)
         # Wait until the paragraph contents changes to "Generation completed"
-        print("waiting for generation to complete...")
+        logging.info("waiting for generation to complete...")
         wait.until(
             EC.text_to_be_present_in_element(
                 (By.CSS_SELECTOR, "p.MuiTypography-root.MuiTypography-body1.css-vsgu40"), "Generation completed"
             )
         )
-        print("Generation completed.")
+        logging("Generation completed.")
         links = []
         prompt = prompt.strip().strip(".").replace(" ", "_")
         if len(prompt) > 40:
             prompt = prompt[:40]
         request_response_div = self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, f"div[data-download-name*='{prompt}']")))
         data_request_id = request_response_div.get_attribute("data-request-id")
-        print(data_request_id)
+        logging.info(f"Request ID: {data_request_id}")
         image_page_link = f"https://ideogram.ai/g/{data_request_id}/0"  # 0 or 1 or 2 or 3 or 4 (because 4 images are generated)
+        logging.info("Image page link fetched successfully.")
+
         self.driver.get(image_page_link)
         self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'img[src*="/api"]')))
         images = self.driver.find_elements(By.CSS_SELECTOR, 'img[src*="/api"]')
-        print(f"images: {images}")
+        # print(f"images: {images}")
         for image in images:
             link = image.get_attribute("src")
             print(link)
@@ -151,7 +155,8 @@ class Ideogram:
                 # So, we skip this page specific image. BTW in rest 4, this image is also including with .jpg src.
                 continue
             links.append(link)
-        print(links)
+        # print(links)
+        logging.info("Fetched all images links successfully.")
         return links
 
     def create_image_with_prompt(self, prompt: str):
@@ -163,6 +168,7 @@ class Ideogram:
         Returns:
             None
         """
+        logging.info("Creating image with prompt...")
         self.driver.get("https://ideogram.ai/t/top/1")
 
         screen_width = self.driver.execute_script("return window.innerWidth")
@@ -194,6 +200,7 @@ class Ideogram:
                 if int(generate_button.get_property("clientWidth")) > 0:
                     generate_button.click()
                     break
+            logging.info("Generate button clicked successfully..")
         else:
             logging.info("Screen width is less than 900px")
             logging.info("Trying to fetch the textarea element.")
@@ -206,3 +213,4 @@ class Ideogram:
 
             # Clicking on the generate button. There is only one generate button in this case.
             self.driver.find_element(By.XPATH, '//button[text()="Generate"]').click()
+            logging.info("Generate button clicked successfully..")
