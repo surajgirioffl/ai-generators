@@ -63,6 +63,48 @@ class Ideogram:
             logging.info("Login success.")
             return True
 
+    def download_images(self, links: list[str], path: str, filenames: list[str] = None):
+        print("started downloading")
+        headers = {
+            "authority": "ideogram.ai",
+            "method": "GET",
+            "scheme": "https",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept-Language": "en-US,en;q=0.9,hi;q=0.8",
+            "Cache-Control": "max-age=0",
+            "Dnt": "1",
+            "Priority": "u=0, i",
+            "Sec-Ch-Ua": '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+            "Sec-Ch-Ua-Mobile": "?0",
+            "Sec-Ch-Ua-Platform": '"Windows"',
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "none",
+            "Sec-Fetch-User": "?1",
+            "Sec-Gpc": "1",
+            "Upgrade-Insecure-Requests": "1",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        }
+        for index, link in enumerate(links):
+            if not filenames:
+                filename = datetime.now().strftime(f"ideogram_%Y%m%d%H%M%S_{index}.jpg")
+            else:
+                filename = filenames[index]
+
+            headers["path"] = link.lstrip("https://ideogram.ai")
+
+            while True:
+                with requests.Session() as session:
+                    session.headers.update(headers)
+                    response = session.get(link)
+                    if response.headers.get("Content-Type") == "image/jpeg":
+                        with open(os.path.join(path, filename), "wb") as file:
+                            file.write(response.content)
+                            break
+                    else:
+                        print("retry")
+
     def fetch_images_link(self, prompt: str) -> list:
         logging.info("Fetching images links...")
         wait = WebDriverWait(self.driver, 300)
