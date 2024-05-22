@@ -63,11 +63,6 @@ class Ideogram:
             logging.info("Login success.")
             return True
 
-    def fetch_images_link(self) -> list:
-        # document.querySelectorAll('div[data-request-id="pbF3tCDURQCsLbew1Ji6GA"]')
-        # <div class="MuiBox-root css-1v0jard" data-download-name="Person_walking_on_the_surface_of_jupiter" data-response-ids="_h9Jm5OrR8OMqMC5D1dDTw,V59aiSuETQCEQihaWnAz7g,ia-p9AowTcirStljW-cfzA,oNjJsWRfRx-niTxF9CmRXw" data-request-id="pbF3tCDURQCsLbew1Ji6GA" data-cover-response-id="ia-p9AowTcirStljW-cfzA"><a href="/g/pbF3tCDURQCsLbew1Ji6GA/0" class="css-p6qci2"><div class="css-ug0zth"><div class="css-1td7xk"></div></div><img src="/assets/image/list/response/_h9Jm5OrR8OMqMC5D1dDTw" class="css-tw9vga"></a></div>
-        pass
-
     def create_image_with_prompt(self, prompt: str):
         """Function that creates an image with the provided prompt.
 
@@ -78,7 +73,6 @@ class Ideogram:
             None
         """
         self.driver.get("https://ideogram.ai/t/top/1")
-        sleep(10)
 
         screen_width = self.driver.execute_script("return window.innerWidth")
         if screen_width >= 900:
@@ -87,11 +81,14 @@ class Ideogram:
             # In this case, there are two textarea elements with same selector. By fetching using querySelector, index may be different for desired textarea in different session.
             # In all possibility, two textarea are returning.
             prompt_textarea_selector = "textarea[placeholder='What do you want to create?']"
-            one_textarea = self.driver.find_element(By.CSS_SELECTOR, prompt_textarea_selector)  # Finding only one instead of both
-            textarea_parent = one_textarea.find_element(By.XPATH, "./..")
-            # Desired textarea is the first child.
-            desired_textarea = textarea_parent.find_element(By.XPATH, "./*")  # First child
-            desired_textarea.send_keys(prompt)
+            self.wait.until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, prompt_textarea_selector)))
+            textarea_elements = self.driver.find_elements(By.CSS_SELECTOR, prompt_textarea_selector)
+
+            # Using same logic as we used in the button (given below). Using clientWidth to determine if element is visible or not.
+            for textarea_element in textarea_elements:
+                if int(textarea_element.get_property("clientWidth")) > 0:
+                    textarea_element.send_keys(prompt)
+                    break
             logging.info("Prompt written successfully..")
 
             # There are two generate buttons. And By fetching using querySelector, index may be different for desired textarea in different session.
