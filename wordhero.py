@@ -2,16 +2,18 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 23rd May 2024
-Last-modified: 25th May 2024
+Last-modified: 26th May 2024
 Error-series: 1200
 """
 
 import logging
 from typing import Any
+from time import sleep
 from selenium.webdriver import Chrome, Edge
 from selenium.webdriver.support.wait import WebDriverWait
 import selenium.webdriver.support.expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
 
 
@@ -66,6 +68,31 @@ class WordHero:
             logging.info("Login successful.")
             return True
 
+    def fetch_all_blog_tools(self):
+        if "/home" not in self.driver.current_url:
+            # If the current page is not home page.
+            self.driver.get(self.URL + "home")
 
-if __name__ == "__main__":
-    pass
+        # Wait until any element located
+        self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.bubble-element.Text.cmaZqaO")))
+        document_body = self.driver.find_element(By.TAG_NAME, "body")
+
+        # Scrolling down. So, all hidden elements will appear.
+        for _ in range(6):
+            document_body.send_keys(Keys.PAGE_DOWN)
+            sleep(0.5)
+
+        document_body.send_keys(Keys.HOME)  # Going to Top of the page
+
+        # Fetching all the blog tools
+        tools = self.driver.find_elements(
+            By.XPATH, "//div[contains(@class, 'bubble-element Text cmaZqaO') and contains(normalize-space(), 'Blog')]"
+        )
+        blog_tools = {}
+
+        for tool in tools:
+            if text := tool.get_property("innerText"):
+                text = text.strip()
+                print(text)
+                blog_tools[text] = tool
+        return blog_tools
