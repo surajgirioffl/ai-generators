@@ -49,12 +49,12 @@ class WordHero:
         self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input[type='password']"))).send_keys(password)  # Password input
 
         if stay_logged_in:
-            stay_logged_in_checkbox = self.driver.find_element((By.CSS_SELECTOR, 'input[type="checkbox"]'))
+            stay_logged_in_checkbox = self.driver.find_element(By.CSS_SELECTOR, 'input[type="checkbox"]')
             if not stay_logged_in_checkbox.get_property("checked"):
                 stay_logged_in_checkbox.click()
 
         # Clicking on the log-in button
-        self.driver.find_element((By.CSS_SELECTOR, "button")).click()
+        self.driver.find_element(By.CSS_SELECTOR, "button").click()
         logging.info("Clicked on log-in button...")
 
         # Checking if login successful or not
