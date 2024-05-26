@@ -45,8 +45,12 @@ class WordHero:
         """
         logging.info("Login to the WordHero...")
         self.driver.get(WordHero.URL + "login")  # We can also use self.URL.
-        self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input[type='email']"))).send_keys(email)  # Email input
-        self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input[type='password']"))).send_keys(password)  # Password input
+        email_input_element = self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input[type='email']")))
+        email_input_element.clear()  # Clearing before entering
+        email_input_element.send_keys(email)  # Email input
+        password_input_element = self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input[type='password']")))
+        password_input_element.clear()  # Clearing before entering
+        password_input_element.send_keys(password)  # Password input
 
         if stay_logged_in:
             stay_logged_in_checkbox = self.driver.find_element(By.CSS_SELECTOR, 'input[type="checkbox"]')
