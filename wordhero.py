@@ -69,6 +69,7 @@ class WordHero:
             return True
 
     def fetch_all_blog_tools(self):
+        """Fetch all blog tools on the current page and return them in a dictionary."""
         if "/home" not in self.driver.current_url:
             # If the current page is not home page.
             self.driver.get(self.URL + "home")
