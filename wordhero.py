@@ -103,6 +103,17 @@ class WordHero:
         return blog_tools
 
     def generate_content_with_chat(self, prompt: str, new_chat: bool = True) -> dict:
+        def wait_until_response_generated() -> None:
+            generation_info_div = self.driver.find_element(By.CLASS_NAME, "cmeat")
+            while True:
+                if generation_info_div.get_property("innerText").strip():
+                    sleep(0.5)
+                    # if innerText contain any value (AI is typing...). Means element is visible and response is generating.
+                    continue
+                else:
+                    # innerText contain no value. ('')
+                    return
+
         logging.info("Generating content with Chat...")
         logging.info("Checking if Chat page is open...")
         if "/chat" not in self.driver.current_url:
@@ -131,8 +142,9 @@ class WordHero:
         # Wait until response is generated
         # Below div will visible until response is generated.
         # <div class="bubble-element Text cmeat bubble-r-vertical-center" style=""><div>AI is typing...</div></div>
-        wait = WebDriverWait(self.driver, 120)
-        wait.until(EC.invisibility_of_element_located((By.CLASS_NAME, "cmeat")))
+        # wait = WebDriverWait(self.driver, 120)
+        # wait.until(EC.invisibility_of_element_located((By.CLASS_NAME, "cmeat")))
+        wait_until_response_generated()
         logging.info("Response generated successfully.")
 
         # Fetching response
