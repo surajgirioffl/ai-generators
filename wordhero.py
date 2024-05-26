@@ -111,8 +111,19 @@ class WordHero:
                     # if innerText contain any value (AI is typing...). Means element is visible and response is generating.
                     continue
                 else:
-                    # innerText contain no value. ('')
+                    # innerText contain no value. (''). Means response has been generated.
                     return
+
+        def wait_until_generation_info_div_is_visible() -> None:
+            generation_info_div = self.driver.find_element(By.CLASS_NAME, "cmeat")
+            while True:
+                if generation_info_div.get_property("innerText").strip():
+                    # if innerText contain any value (AI is typing...). Means element is visible and response is generating.
+                    return
+                else:
+                    # innerText contain no value. (''). Means response generation is not yet started.
+                    sleep(0.2)
+                    continue
 
         logging.info("Generating content with Chat...")
         logging.info("Checking if Chat page is open...")
@@ -135,8 +146,9 @@ class WordHero:
         textarea.clear()
         textarea.send_keys(prompt)
         textarea.send_keys(Keys.ENTER)
+        # self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "cmeaUaQ"))).click()
+        wait_until_generation_info_div_is_visible()  # Checking if generation info div appeared.
         logging.info("Prompt written successfully..")
-        sleep(1)
 
         logging.info("Waiting for response...")
         # Wait until response is generated
@@ -146,6 +158,7 @@ class WordHero:
         # wait.until(EC.invisibility_of_element_located((By.CLASS_NAME, "cmeat")))
         wait_until_response_generated()
         logging.info("Response generated successfully.")
+        sleep(1)
 
         # Fetching response
         qa_div_xpath = "//div[contains(@id, 'current_cell_text_')]"  # Div containing questions and answers/responses
