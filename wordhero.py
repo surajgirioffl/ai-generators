@@ -101,3 +101,54 @@ class WordHero:
                 print(text)
                 blog_tools[text] = tool
         return blog_tools
+
+    def generate_content_with_chat(self, prompt: str, new_chat: bool = True) -> dict:
+        logging.info("Generating content with Chat...")
+        logging.info("Checking if Chat page is open...")
+        if "/chat" not in self.driver.current_url:
+            # If the current page is not chat page.
+            logging.info("Chat page is not open. Opening it...")
+            self.driver.get(self.URL + "chat")
+
+        logging.info("Chat page opened successfully...")
+
+        if new_chat:
+            # Clicking on new chat
+            logging.info("Starting a new conversation...")
+            self.wait.until(EC.visibility_of_element_located((By.XPATH, "//button[contains(., 'New Chat')]"))).click()
+        else:
+            logging.info("Skipping new chat. Continue with existing conversation of the chat page...")
+
+        textarea = self.wait.until(EC.visibility_of_element_located((By.TAG_NAME, "textarea")))
+        logging.info("Writing prompt...")
+        textarea.clear()
+        textarea.send_keys(prompt)
+        textarea.send_keys(Keys.ENTER)
+        logging.info("Prompt written successfully..")
+        sleep(1)
+
+        logging.info("Waiting for response...")
+        # Wait until response is generated
+        # Below div will visible until response is generated.
+        # <div class="bubble-element Text cmeat bubble-r-vertical-center" style=""><div>AI is typing...</div></div>
+        wait = WebDriverWait(self.driver, 120)
+        wait.until(EC.invisibility_of_element_located((By.CLASS_NAME, "cmeat")))
+        logging.info("Response generated successfully.")
+
+        # Fetching response
+        qa_div_xpath = "//div[contains(@id, 'current_cell_text_')]"  # Div containing questions and answers/responses
+        qa_divs = self.driver.find_elements(By.XPATH, qa_div_xpath)
+
+        # index 0 question - index 1 it's answer
+        # index 2 question - index 3 it's answer
+        # index 4 question - index 5 it's answer
+        # And so on...
+
+        prompt_response_dict = {}
+
+        for index in range(0, len(qa_divs), 2):
+            question = qa_divs[index].get_property("innerText")
+            answer = qa_divs[index + 1].get_property("innerText")
+            prompt_response_dict[question] = answer
+
+        return prompt_response_dict
