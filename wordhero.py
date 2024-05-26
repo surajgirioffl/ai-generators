@@ -9,6 +9,7 @@ Error-series: 1200
 import logging
 from typing import Any
 from time import sleep
+import inflect
 from selenium.webdriver import Chrome, Edge
 from selenium.webdriver.support.wait import WebDriverWait
 import selenium.webdriver.support.expected_conditions as EC
@@ -111,6 +112,10 @@ class WordHero:
 
         Returns:
             dict: A dictionary containing questions and their corresponding answers/responses.
+
+        More:
+            - Prompt must not contain any '\n' (new line) characters. Otherwise, the prompt will submitted without writing the complete prompt as passed.
+            - \n will act as ENTER and it submits the prompt immediately without writing any character next to it.
         """
 
         def wait_until_response_generated() -> None:
