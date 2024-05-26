@@ -111,7 +111,7 @@ class WordHero:
             new_chat (bool, optional): Flag to indicate if a new chat should be started. Defaults to True.
 
         Returns:
-            dict: A dictionary containing questions and their corresponding answers/responses.
+            dict: A dictionary containing questions and their corresponding answers/responses (In the same order as the questions are passed).
 
         More:
             - Prompt must not contain any '\n' (new line) characters. Otherwise, the prompt will submitted without writing the complete prompt as passed.
@@ -196,6 +196,16 @@ class WordHero:
         return prompt_response_dict
 
     def generate_article(self, headline: str, tone: str, number_of_words: int) -> tuple[str, dict]:
+        """Generate an article based on the provided headline, tone, and number of words.
+
+        Parameters:
+            headline (str): The headline of the article.
+            tone (str): The tone in which the article should be written. Like 'funny', 'scientific' etc.
+            number_of_words (int): The total number of words in the article. Better if in multiple of 500.
+
+        Returns:
+            tuple[str, dict]: A tuple containing the generated article as a string and a dictionary of prompt responses.
+        """
         engine = inflect.engine()  # for ordinal number (1st, 2nd, etc.)
         number_of_part = number_of_words // 500
         article: str = ""
