@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 23rd May 2024
-Last-modified: 26th May 2024
+Last-modified: 27th May 2024
 Error-series: 1200
 """
 
@@ -194,3 +194,19 @@ class WordHero:
             prompt_response_dict[question] = answer
 
         return prompt_response_dict
+
+    def generate_article(self, headline: str, tone: str, number_of_words: int):
+        engine = inflect.engine()  # for ordinal number (1st, 2nd, etc.)
+        number_of_part = number_of_words // 500
+
+        for part in range(1, number_of_part + 1):
+            if part == 1:
+                prompt = f"""Write a {number_of_words} word article about "{headline}". Write in {number_of_part} parts with approximate 500 words each. Start with the headline, multiple subheadings. Content for each subheading should be 120-150 words long. Write in a {tone} tone. Give me the first part."""
+                prompt_response_dict = self.generate_content_with_chat(prompt)
+                with open("article.txt", "w") as file:
+                    file.write(prompt_response_dict[prompt])
+            else:
+                prompt = f"Give me the {engine.ordinal(part)} part."
+                prompt_response_dict = self.generate_content_with_chat(prompt, False)
+                with open("article.txt", "a") as file:
+                    file.write(prompt_response_dict[prompt])
