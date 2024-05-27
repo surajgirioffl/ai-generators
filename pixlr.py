@@ -27,3 +27,21 @@ class Pixlr:
         """
         self.driver = driver
         self.wait = WebDriverWait(self.driver, 60)
+
+    def login(self, email: str, password: str) -> bool:
+        self.driver.get(Pixlr.URL)
+
+        # Click on login button
+        self.wait.until(EC.visibility_of_element_located((By.ID, "head-login"))).click()
+        # Use email password to login instead of login with Google/Facebook/Apple
+
+        # Clicking on the button having text 'Or use email' (Means login using email)
+        self.driver.find_element(value="choose-email").click()
+
+        # Writing email and password
+        self.wait.until(EC.visibility_of_element_located((By.ID, "entry-email"))).send_keys(email)
+        self.driver.find_element(value="entry-password").send_keys(password)
+
+        self.wait.until(EC.element_to_be_clickable((By.ID, "entry-submit"))).click()
+
+        ...  # Use logic to wait until the login successful (Like login/signup button disappear after success)
