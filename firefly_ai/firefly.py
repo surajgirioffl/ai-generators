@@ -3,7 +3,7 @@
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 27th May 2024
 Last-modified: 27th May 2024
-Error-series: 11 00
+Error-series: 1100
 """
 
 import requests
