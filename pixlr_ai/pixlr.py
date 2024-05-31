@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 27th May 2024
-Last-modified: 29th May 2024
+Last-modified: 1st June 2024
 Error-series: 1200
 """
 
@@ -12,6 +12,7 @@ from selenium.webdriver import Chrome, Edge
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 class Pixlr:
@@ -62,3 +63,130 @@ class Pixlr:
         # Use logic to wait until the login successful (Like login/signup button disappear after success)
         self.wait.until(EC.invisibility_of_element_located((By.ID, "head-login")))
         logging.info("Logging successful...")
+
+    def generate_image(
+        self,
+        prompt: str,
+        aspect: str = None,
+        style: str = None,
+        color: str = None,
+        lighting: str = None,
+        composition: str = None,
+        negative_prompt: str = None,
+    ) -> None:
+        logging.info("Generating image...")
+        if "pixlr.com/image-generator" not in self.driver.current_url:
+            logging.info("URL of image generator page not found. Redirecting...")
+            self.driver.get(self.URL)
+
+        # Clicking on the prompt-options container. So, all elements appear on the screen.
+        self.wait.until(EC.visibility_of_element_located((By.ID, "generator-main-modal"))).click()
+
+        # Writing prompt
+        self.wait.until(EC.visibility_of_element_located((By.ID, "generator-positive"))).send_keys(prompt)
+        logging.info("Prompt written successfully...")
+
+        # Negative prompt if provided
+        if negative_prompt:
+            # Clicking on negative prompt toggle checkbox
+            # self.driver.find_element(By.ID, "negative-prompt-toggle").click() # Not working
+            self.driver.execute_script('document.querySelector("#negative-prompt-toggle").click()')
+            # Writing negative prompt
+            self.wait.until(EC.visibility_of_element_located((By.ID, "generator-negative"))).send_keys(negative_prompt)
+            logging.info("Negative prompt written successfully...")
+
+        logging.info("It's time to select options if provided else default will use...")
+        # selenium.common.exceptions.ElementNotInteractableException: Message: element not interactable (Means we can't interact with that element. Cause may be element is hidden, required hover to visible...)
+        # Above exception is raised when I have tried to click on the options that visible after mouse hover.
+        # So, I am going to use ActionChain to simulate the mouse hover, so element became interactable and then click.
+
+        options: dict[str, dict[str, str]] = {
+            "aspect": {
+                "Square": "aspect-square",
+                "Wide": "aspect-wide",
+                "Tall": "aspect-tall",
+            },
+            "style": {
+                "None": "style-none",
+                "Enhance": "style-enhance",
+                "Anime": "style-anime",
+                "Photographic": "style-photographic",
+                "Digital Art": "style-digital-art",
+                "Comic Book": "style-comic-book",
+                "Fantasy Art": "style-fantasy-art",
+                "Analog Film": "style-analog-film",
+                "Neon Punk": "style-neon-punk",
+                "Isometric": "style-isometric",
+                "Low Poly": "style-low-poly",
+                "Origami": "style-origami",
+                "Line Art": "style-line-art",
+                "Craft Clay": "style-craft-clay",
+                "Cinematic": "style-cinematic",
+                "3D Model": "style-3d-model",
+                "Pixel Art": "style-pixel-art",
+            },
+            "color": {
+                "None": "color-none",
+                "Warm Tone": "color-warm-tone",
+                "Cool Tone": "color-cool-tone",
+                "Muted Colors": "color-muted-colors",
+                "Vibrant Colors": "color-vibrant-colors",
+                "Pastel Colors": "color-pastel-colors",
+                "Black And White": "color-black-and-white",
+            },
+            "lighting": {
+                "None": "lighting-none",
+                "Studio": "lighting-studio",
+                "Backlight": "lighting-backlight",
+                "Sunlight": "lighting-sunlight",
+                "Dramatic": "lighting-dramatic",
+                "Low Light": "lighting-low-light",
+                "Volumetric": "lighting-volumetric",
+                "Rim Lighting": "lighting-rim-lighting",
+                "Dimly Lit": "lighting-dimly-lit",
+                "Golden Hour": "lighting-golden-hour",
+                "Crepuscular Rays": "lighting-crepuscular-rays",
+            },
+            "composition": {
+                "None": "composition-none",
+                "Blurry Background": "composition-blurry-background",
+                "Close Up": "composition-close-up",
+                "Wide Angle": "composition-wide-angle",
+                "Narrow Depth Of Field": "composition-narrow-depth-of-field",
+                "Shot From Below": "composition-shot-from-below",
+                "Shot From Above": "composition-shot-from-above",
+                "Macrophotography": "composition-macrophotography",
+            },
+        }
+        actions = ActionChains(self.driver)
+        self.actions: ActionChains = actions
+
+        aspect_option_button_label = self.driver.find_element(By.ID, "aspect-type-label")
+        style_option_button_label = self.driver.find_element(By.ID, "style-type-label")
+        color_option_button_label = self.driver.find_element(By.ID, "color-type-label")
+        lighting_option_button_label = self.driver.find_element(By.ID, "lighting-type-label")
+        composition_option_button_label = self.driver.find_element(By.ID, "composition-type-label")
+
+        if aspect:
+            self.actions.move_to_element(aspect_option_button_label).click_and_hold().perform()
+            self.driver.find_element(By.ID, options["aspect"][aspect.title()]).click()
+
+        if style:
+            self.actions.move_to_element(style_option_button_label).click_and_hold().perform()
+            self.driver.find_element(By.ID, options["style"][style.title()]).click()
+
+        if color:
+            self.actions.move_to_element(color_option_button_label).click_and_hold().perform()
+            self.driver.find_element(By.ID, options["color"][color.title()]).click()
+
+        if lighting:
+            self.actions.move_to_element(lighting_option_button_label).click_and_hold().perform()
+            self.driver.find_element(By.ID, options["lighting"][lighting.title()]).click()
+
+        if composition:
+            self.actions.move_to_element(composition_option_button_label).click_and_hold().perform()
+            self.driver.find_element(By.ID, options["composition"][composition.title()]).click()
+
+        generate_button_selector = ".button.med.positive.but"
+        self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, generate_button_selector))).click()
+        logging.info("Generate button clicked successfully....")
