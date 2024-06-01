@@ -162,7 +162,8 @@ cython_debug/
 
 # Added by Suraj Kumar Giri
 dev/
-appdata/
 temp/
-logs/
-prompt.txt/
+appdata/
+profile/
+prompt.csv
+output/
