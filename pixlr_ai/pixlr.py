@@ -216,3 +216,22 @@ class Pixlr:
         images = image_container.find_elements(By.CSS_SELECTOR, "img.result")
         logging.info("Images links fetched successfully...")
         return [image.get_attribute("src") for image in images]
+
+    def download_images(self, links: list[str], path: str, filename: str | None = None):
+        logging.info("Downloading images...")
+        original_filename = filename  # Saving the filename in another variable. So, it will not lost.
+
+        # Links contains image data and base64 encoded
+        # Link is like: 'data:image/png;base64,....base64_text.......'
+        decoded_images_data: list[bytes] = [base64.b64decode(link.split(",")[1]) for link in links]
+        logging.info("Image data decoded successfully....")
+
+        for index, image_data in enumerate(decoded_images_data):
+            if original_filename:
+                filename = f"{filename}_{index}.png"
+            else:
+                filename = datetime.now().strftime(f"pixlr_%Y%m%d%H%M%S_{index}.png")
+
+            with open(os.path.join(path, filename), "wb") as file:
+                file.write(image_data)
+        logging.info("Images downloaded successfully...")
