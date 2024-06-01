@@ -8,6 +8,10 @@ Error-series: 1200
 
 import logging
 from typing import Any
+from datetime import datetime
+import base64
+import os
+import time
 from selenium.webdriver import Chrome, Edge
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -190,3 +194,25 @@ class Pixlr:
         generate_button_selector = ".button.med.positive.but"
         self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, generate_button_selector))).click()
         logging.info("Generate button clicked successfully....")
+
+    def fetch_images_link(self) -> list:
+        logging.info("Fetching images link...")
+        wait = WebDriverWait(self.driver, 300)
+
+        # Image container appears immediately after 'Generate' button is clicked. If it doesn't appear means 'Generator' button is not clicked or failed to clicked.
+        logging.info("Waiting for the image container to appear. When 'Generate button' is clicked, it appears immediately.")
+        t1 = time.time()
+        image_container = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "pane")))
+        t2 = time.time()
+        logging.debug(f"Image container appeared in {t2-t1} seconds")
+
+        # Images are displayed when generation completed. It may take from 15 sec to 300 sec.
+        logging.info("Waiting for image to appear...")
+        t1 = time.time()
+        wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "img.result")))
+        t2 = time.time()
+        logging.debug(f"Images appeared in {t2-t1} seconds")
+
+        images = image_container.find_elements(By.CSS_SELECTOR, "img.result")
+        logging.info("Images links fetched successfully...")
+        return [image.get_attribute("src") for image in images]
