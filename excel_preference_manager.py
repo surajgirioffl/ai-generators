@@ -67,3 +67,50 @@ class PreferenceManager:
             list[str]: A list of prompt strings.
         """
         return self.prompts_df["prompt"].to_list()
+
+    def fetch_sites_preferences(self) -> list[dict]:
+        """
+        Fetches the sites preferences along with site metadata from the options dataframe and organizes them into a list of dictionaries.
+
+        Returns:
+            list[dict]: A list of dictionaries containing site preferences.
+
+        Example:
+            site_options: [1st_site_options, 2nd_site_options, ...]
+            1st site option: {'site': 'pixverse', 'category': 'image_to_video', 'automation_status': True, 'options': {'image': '', 'prompt': '', 'camera_motion': '', 'motion_strength': '', 'seed': '', 'hd_quality': 1.0}}
+        """
+        number_of_rows = len(self.options_df)
+        sites_options: list = []
+
+        # Iterating through each row of the dataframe
+        for index in range(number_of_rows):
+            site_dict: dict = {}  # Contains site specific key-values
+            options_dict: dict = {}  # Contains site options key-values
+
+            # Fetching the row as a dictionary of key-value pairs where keys are columns
+            row_col_dict = self.options_df.iloc[index].to_dict()
+
+            for key, value in row_col_dict.items():
+                if "option" in key:
+                    if value:
+                        options_dict[value] = ""
+                        last_key = value
+                elif "value" in key:
+                    if value:
+                        options_dict[last_key] = value
+                else:
+                    site_dict[key] = value
+
+            site_dict["options"] = options_dict
+            sites_options.append(site_dict)
+
+        return sites_options
+
+
+if __name__ == "__main__":
+    preferences = PreferenceManager()
+    print(preferences.fetch_prompts())
+    print()
+    print(preferences.fetch_sites_preferences())
+    print()
+    print(preferences.fetch_categories_and_sites())
