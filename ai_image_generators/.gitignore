@@ -167,4 +167,4 @@ appdata/
 profile/
 prompt.csv
 output/
-prompt.txt
+*.txt
