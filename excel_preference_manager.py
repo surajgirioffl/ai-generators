@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 8th June 2024
-Last-modified: 8th June 2024
+Last-modified: 9th June 2024
 Error-series: 2100
 """
 
@@ -68,19 +68,19 @@ class PreferenceManager:
         """
         return self.prompts_df["prompt"].to_list()
 
-    def fetch_sites_preferences(self) -> list[dict]:
+    def fetch_sites_preferences(self) -> dict[dict]:
         """
         Fetches the sites preferences along with site metadata from the options dataframe and organizes them into a list of dictionaries.
 
         Returns:
-            list[dict]: A list of dictionaries containing site preferences.
+            dict[dict]: A list of dictionaries containing site preferences.
 
         Example:
-            site_options: [1st_site_options, 2nd_site_options, ...]
+            site_options: {category1: {site1: {site1_options}, site2: {site2_options}}, category2: {site1: {site1_options}, site2: {site2_options}}, ...}
             1st site option: {'site': 'pixverse', 'category': 'image_to_video', 'automation_status': True, 'options': {'image': '', 'prompt': '', 'camera_motion': '', 'motion_strength': '', 'seed': '', 'hd_quality': 1.0}}
         """
         number_of_rows = len(self.options_df)
-        sites_options: list = []
+        sites_options: dict[dict] = {}
 
         # Iterating through each row of the dataframe
         for index in range(number_of_rows):
@@ -102,8 +102,12 @@ class PreferenceManager:
                     site_dict[key] = value
 
             site_dict["options"] = options_dict
-            sites_options.append(site_dict)
 
+            try:
+                sites_options[row_col_dict["category"]][site_dict["site"]] = site_dict
+            except KeyError:
+                # If the category is not present in the dictionary
+                sites_options[row_col_dict["category"]] = {site_dict["site"]: site_dict}
         return sites_options
 
 
