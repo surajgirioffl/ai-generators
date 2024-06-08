@@ -58,3 +58,12 @@ class PreferenceManager:
             sites_category_mapping[category] = sites
 
         return categories, sites_category_mapping
+
+    def fetch_prompts(self) -> list[str]:
+        """
+        Fetches the prompts from the prompts_df DataFrame and returns them as a list of strings.
+
+        Returns:
+            list[str]: A list of prompt strings.
+        """
+        return self.prompts_df["prompt"].to_list()
