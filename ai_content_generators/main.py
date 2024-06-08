@@ -13,7 +13,7 @@ __version__ = "0.0.0"
 
 import os
 import tools
-from wordhero import WordHero
+from .wordhero import WordHero
 
 
 APP_REQUIRED_DIRS = ["appdata", "appdata/logs", "appdata/profile"]

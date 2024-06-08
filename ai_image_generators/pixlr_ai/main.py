@@ -14,7 +14,7 @@ __version__ = "0.0.0"
 import os
 from time import sleep
 import tools
-from pixlr import Pixlr
+from .pixlr import Pixlr
 
 
 PROJECT_DIR = os.path.dirname(__file__)
