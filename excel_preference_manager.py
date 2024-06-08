@@ -36,3 +36,25 @@ class PreferenceManager:
             # Replacing NaN with '' (empty string)
             self.options_df: pd.DataFrame = options_df.map(lambda value: "" if pd.isna(value) else value)
             self.prompts_df: pd.DataFrame = prompts_df.map(lambda value: "" if pd.isna(value) else value)
+
+    def fetch_categories_and_sites(self) -> tuple[list, dict]:
+        """
+        Fetches unique categories and sites belongs to each unique category from the options dataframe.
+
+        Returns:
+            list: A list of unique categories.
+            dict: A dictionary mapping categories to a list of sites.
+
+        Examples:
+            categories: ['text_to_video', 'image_to_video', 'text_to_image', 'text_to_text']
+            sites_category_mapping: {'text_to_video': ['pixverse', 'haiper'], 'image_to_video': ['pixverse', 'haiper'], 'text_to_image': ['ideogram', 'pixlr'], 'text_to_text': ['wordhero']
+        """
+        sites_category_mapping: dict = {}
+
+        categories: list = self.options_df["category"].drop_duplicates().to_list()
+
+        for category in categories:
+            sites: list = self.options_df.loc[self.options_df["category"] == category, "site"].to_list()
+            sites_category_mapping[category] = sites
+
+        return categories, sites_category_mapping
