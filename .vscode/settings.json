@@ -1,21 +1,23 @@
 {
     "cSpell.words": [
-        "dearpygui",
-        "pyautogui",
-        "pymongo",
         "appdata",
         "cmeat",
-        "levelname",
-        "wordhero",
-        "interactable",
-        "macrophotography",
-        "pixlr",
+        "dearpygui",
         "edgedriver",
         "haiper",
+        "interactable",
         "lensgo",
+        "levelname",
+        "macrophotography",
         "oauthchooseaccount",
+        "pandasql",
+        "pixlr",
         "pixverse",
+        "pyautogui",
+        "pymongo",
+        "sqldf",
         "surajgirioffl",
-        "testid"
+        "testid",
+        "wordhero"
     ]
 }
