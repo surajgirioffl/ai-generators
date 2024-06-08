@@ -47,17 +47,17 @@ class PreferenceManager:
 
         Examples:
             categories: ['text_to_video', 'image_to_video', 'text_to_image', 'text_to_text']
-            sites_category_mapping: {'text_to_video': ['pixverse', 'haiper'], 'image_to_video': ['pixverse', 'haiper'], 'text_to_image': ['ideogram', 'pixlr'], 'text_to_text': ['wordhero']
+            categories_sites_mapping: {'text_to_video': ['pixverse', 'haiper'], 'image_to_video': ['pixverse', 'haiper'], 'text_to_image': ['ideogram', 'pixlr'], 'text_to_text': ['wordhero']
         """
-        sites_category_mapping: dict = {}
+        categories_sites_mapping: dict = {}
 
         categories: list = self.options_df["category"].drop_duplicates().to_list()
 
         for category in categories:
             sites: list = self.options_df.loc[self.options_df["category"] == category, "site"].to_list()
-            sites_category_mapping[category] = sites
+            categories_sites_mapping[category] = sites
 
-        return categories, sites_category_mapping
+        return categories, categories_sites_mapping
 
     def fetch_prompts(self) -> list[str]:
         """
