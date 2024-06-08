@@ -1,3 +1,7 @@
 {
-    "logging_location": "appdata/logs/script.log"
+    "logging_location": "appdata/logs/script.log",
+    "wordhero_credentials": {
+        "email": "",
+        "password": ""
+    }
 }
