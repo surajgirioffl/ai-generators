@@ -7,6 +7,7 @@ Last-modified: 10th June 2024
 Error-series: 2200
 """
 
+import logging
 import importlib
 import sys
 from typing import Literal
@@ -194,6 +195,14 @@ def main(
         "text_to_text": "ai_content_generators",
     }
 
+    logging.info("======================Starting a new AI Generation =======================")
+    logging.info(f"Category: {selected_category} | Site: {selected_site} | Prompt: {selected_prompt}")
+
     module = f"{category_package_name_mapping[selected_category]}.{selected_site}_ai.main"
     module = importlib.import_module(module)
-    module.main(site_preferences=sites_preferences[selected_category][selected_site], driver=driver, *args, **kwargs)
+    status: bool = module.main(site_preferences=sites_preferences[selected_category][selected_site], driver=driver, *args, **kwargs)
+
+    if status:
+        logging.info("======================AI Generation Completed | STATUS -> SUCCESS =======================")
+    else:
+        logging.warning("======================AI Generation Failed | STATUS -> FAILED =======================")
