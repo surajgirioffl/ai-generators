@@ -190,7 +190,7 @@ def login_to_google_with_email_and_password(
         return True
 
 
-def main() -> None:
+def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
     """Driver function to integrate and execute the script.
 
     Returns:
@@ -203,52 +203,43 @@ def main() -> None:
     logging.info("-----------------STARTING A NEW SESSION-----------------")
 
     # ------------------ Main workflow will start from here ---------------------
-    driver = get_webdriver_instance()
-    driver.maximize_window()
-    if CONFIG["google_login_options_start"]["manual_login"] == "Y":
-        is_login_success = login_to_google_account(driver)
-    else:
-        email = CONFIG["google_login_options_start"]["email"]
-        password = CONFIG["google_login_options_start"]["password"]
-        is_login_success = login_to_google_with_email_and_password(driver, email, password)
+    local_webdriver = False
+    if not driver:
+        driver = get_webdriver_instance()
+        driver.maximize_window()
+        local_webdriver = True
 
-    if not is_login_success:
-        print("Error: Google login failed. Error Code: 1505")
-        logging.error("Google login failed. Error Code: 1505")
-        driver.quit()
-        return False
+    if site_preferences.get("login_required"):
+        if CONFIG["google_login_options_start"]["manual_login"] == "Y":
+            is_login_success = login_to_google_account(driver)
+        else:
+            email = CONFIG["google_login_options_start"]["email"]
+            password = CONFIG["google_login_options_start"]["password"]
+            is_login_success = login_to_google_with_email_and_password(driver, email, password)
 
-    option_enabled = False  # Specify if the options are enabled
+        if not is_login_success:
+            print("Error: Google login failed. Error Code: 1505")
+            logging.error("Google login failed. Error Code: 1505")
+            if local_webdriver:
+                driver.quit()
+            return False
 
     # Creating instance of the Ideogram class
     ideogram = Ideogram(driver)
-    ideogram.login_with_google()
+    if site_preferences.get("login_required"):
+        ideogram.login_with_google()
 
-    if CONFIG["options_start"]["use_prompts"] == "Y":
-        logging.info("Initiating image generation from prompt...")
-        option_enabled = True
-        prompt_file_location = CONFIG["Default_location_start"]["default_prompt_file_location"]
-        try:
-            with open(prompt_file_location) as file:
-                prompt = file.read()
-        except FileNotFoundError as e:
-            print("Error: Prompt file not found. Error Code: 1507")
-            logging.error("Prompt file not found. Error Code: 1507")
-            logging.error(f"Exception: {e}")
-        else:
-            ideogram.create_image_with_prompt(prompt)
-            ideogram.download_images(ideogram.fetch_images_link(prompt), CONFIG["Default_location_start"]["default_output_location_local"])
+    logging.info("Initiating image generation from prompt...")
 
-    sleep(5000)
+    ideogram.create_image_with_prompt(**site_preferences["options"])
+    ideogram.download_images(
+        ideogram.fetch_images_link(site_preferences["options"]["prompt"]),
+        CONFIG["Default_location_start"]["default_output_location_local"],
+    )
 
-    print("Operation Completed. Closing the webdriver.")
-    logging.info("Operation Completed. Closing the webdriver.")
-    driver.quit()  # Closing the browser
-
-    if not option_enabled:
-        print("No options are enabled to generate video. Please enable at least one option. Error Code: 1503")
-        logging.info("No options are enabled to generate video. Please enable at least one option. Error Code: 1503")
-        return False
+    logging.info("Operation Completed @Ideogram")
+    if local_webdriver:
+        driver.quit()  # Closing the browser
     return True
 
 
