@@ -182,6 +182,11 @@ def main(
             continue
         break
 
+    # Updating prompt for the selected site
+    if "prompt" in sites_preferences[selected_category][selected_site]["options"].keys():
+        # BTW Above condition is not required. If prompt key doesn't exist then 'prompt' key will created and accepted by **kwargs of the function which accept this site options as args.
+        sites_preferences[selected_category][selected_site]["options"]["prompt"] = selected_prompt
+
     category_package_name_mapping: dict[str, str] = {
         "text_to_video": "ai_video_generators",
         "image_to_video": "ai_video_generators",
