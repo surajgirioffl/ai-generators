@@ -6,7 +6,9 @@ Last-modified: 10th June 2024
 Error-series: 1200
 """
 
+import datetime
 import logging
+import os
 from typing import Any
 from time import sleep
 import inflect
@@ -32,6 +34,20 @@ class WordHero:
         """
         self.driver = driver
         self.wait = WebDriverWait(self.driver, 60)
+
+    @staticmethod
+    def save_content(content: str, path: str, filename: str = None) -> None:
+        """Save the content to a file.
+
+        Args:
+            content (str): The content to be saved.
+            path (str): The directory path where the video will be saved.
+            filename (str, optional): The name of the file to save the content as. If not provided, a default filename will be generated.
+        """
+        if not filename:
+            filename = datetime.now().strftime("wordhero_%Y%m%d%H%M%S.txt")
+        with open(os.path.join(path, filename), "w") as file:
+            file.write(content)
 
     def login_to_wordhero(self, email: str, password: str, stay_logged_in: bool = True) -> bool:
         """Logs into WordHero using the provided email and password.
