@@ -31,6 +31,11 @@ def main() -> None:
     and determines whether to start the CLI or GUI version based on the arguments provided.
 
     Does not take any parameters and does not return anything.
+
+    More Info:
+        - If provided args are "CLI" or "cli", it starts the CLI version of the application.
+        - If provided args are "GUI" or "gui", it starts the GUI version of the application.
+        - If no args are provided, it starts the default CLI version of the application.
     """
     preference_manager = PreferenceManager()
     categories, categories_sites_mapping = preference_manager.fetch_categories_and_sites()
