@@ -12,12 +12,22 @@ __email__ = "surajgirioffl@gmail.com"
 __version__ = "0.0.0"
 
 import os
-import tools
-from .wordhero import WordHero
+
+if __name__ == "__main__":
+    import tools
+    from wordhero import WordHero
+else:
+    # Relative import (for executing from the root project directory)
+    from . import tools
+    from .wordhero import WordHero
 
 
 APP_REQUIRED_DIRS = ["appdata", "appdata/logs", "appdata/profile"]
-SETTINGS: dict = tools.load_settings()
+PROJECT_DIR = os.path.dirname(__file__)
+
+os.chdir(PROJECT_DIR)  # Changing the current working directory to the project directory.
+
+SETTINGS: dict = tools.load_settings("config.json")
 
 
 tools.create_app_require_directories(APP_REQUIRED_DIRS)
