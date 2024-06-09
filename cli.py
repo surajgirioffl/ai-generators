@@ -3,7 +3,7 @@
 CLI module to provide Command Line Interface for the application.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 09th June 2024
-Last-modified: 09th June 2024
+Last-modified: 10th June 2024
 Error-series: 2200
 """
 
@@ -182,26 +182,13 @@ def main(
             continue
         break
 
-    # ai_video_generators package
-    if selected_category == "text_to_video":
-        module = f"ai_video_generators.{selected_site}_ai.main"
-        module = importlib.import_module(module)
-        module.main(site_preferences=sites_preferences[selected_category][selected_site], driver=driver, *args, **kwargs)
+    category_package_name_mapping: dict[str, str] = {
+        "text_to_video": "ai_video_generators",
+        "image_to_video": "ai_video_generators",
+        "text_to_image": "ai_image_generators",
+        "text_to_text": "ai_content_generators",
+    }
 
-    # ai_video_generators package
-    if selected_category == "image_to_video":
-        module = f"ai_video_generators.{selected_site}_ai.main"
-        module = importlib.import_module(module)
-        module.main(site_preferences=sites_preferences[selected_category][selected_site], driver=driver, *args, **kwargs)
-
-    # ai_image_generators package
-    if selected_category == "text_to_image":
-        module = f"ai_image_generators.{selected_site}_ai.main"
-        module = importlib.import_module(module)
-        module.main(site_preferences=sites_preferences[selected_category][selected_site], driver=driver, *args, **kwargs)
-
-    # ai_content_generator package ✅
-    if selected_category == "text_to_text":
-        module = f"ai_content_generators.{selected_site}_ai.main"
-        module = importlib.import_module(module)
-        module.main(site_preferences=sites_preferences[selected_category][selected_site], driver=driver, *args, **kwargs)
+    module = f"{category_package_name_mapping[selected_category]}.{selected_site}_ai.main"
+    module = importlib.import_module(module)
+    module.main(site_preferences=sites_preferences[selected_category][selected_site], driver=driver, *args, **kwargs)
