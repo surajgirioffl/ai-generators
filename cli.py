@@ -95,3 +95,45 @@ def site_selector_menu(sites: list[str], selected_category: str) -> str | Litera
         else:
             print("Invalid choice. Write again...\n")
             continue
+
+
+def prompt_selector_menu(prompts: list[str], selected_site: str) -> str | Literal[False]:
+    """
+    A function to display a prompt selection menu based on a list of prompts.
+
+    Parameters:
+        prompts (list[str]): a list of strings representing different prompts to choose from
+        selected_site (str): a string representing the selected site
+
+    Returns:
+        str | Literal[False]: Returns the selected prompt on success else False.
+    """
+    index_prompt_mapping = {}
+
+    print("\n")
+    while True:
+        print(f"===================PROMPT SELECTION MENU (Site: {selected_site.replace('_', ' ').title()})===================")
+        print("=> Press 'enter' to skip the prompt (prompt not required)")
+        print("=> Press 'w' to write your own prompt")
+        print("=> Write '@' or 'clear' to clear the display")
+        print("=> Write '#' or 'exit' to go back to Site Selection Menu")
+        for index, prompt in enumerate(prompts):
+            print(f"=> Press {index} for '{prompt.replace('_', ' ').title()}'")
+            index_prompt_mapping[f"{index}"] = prompt
+
+        choice = input("Write your choice: ")
+
+        if choice in index_prompt_mapping.keys():
+            return index_prompt_mapping[choice]
+        elif choice in ["@", "clear"]:
+            clear_screen()
+            continue
+        elif choice in ["#", "exit"]:
+            return False
+        elif choice == "w":
+            return input("Write your prompt: ")
+        elif choice == "":
+            return ""
+        else:
+            print("Invalid choice. Write again...\n")
+            continue
