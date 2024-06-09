@@ -228,7 +228,7 @@ class WordHero:
             raise ValueError("Please provide a valid headline, tone and number of words. Error Code: 1202")
 
         engine = inflect.engine()  # for ordinal number (1st, 2nd, etc.)
-        number_of_part = number_of_words // 500
+        number_of_part = int(number_of_words) // 500
         article: str = ""
 
         for part in range(1, number_of_part + 1):
