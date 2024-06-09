@@ -58,3 +58,40 @@ def category_selector_menu(categories: list[str]) -> str | Literal[False]:
         else:
             print("Invalid choice. Write again...\n")
             continue
+
+
+def site_selector_menu(sites: list[str], selected_category: str) -> str | Literal[False]:
+    """
+    A function that displays a site selection menu based on the provided list of sites.
+
+    Parameters:
+        sites (list[str]): A list of strings representing different site names.
+        selected_category (str): A string representing the selected category (Shown in the title of the menu).
+
+    Returns:
+        str | Literal[False]: Returns the selected site on success or False to indicate exiting the menu.
+    """
+    index_site_mapping = {}
+
+    print("\n")
+    while True:
+        print(f"===================SITE SELECTION MENU (CATEGORY: {selected_category.replace('_', ' ').title()})===================")
+        for index, site in enumerate(sites):
+            print(f"=> Press {index} to select site '{site.replace('_', ' ').title()}'")
+            index_site_mapping[f"{index}"] = site
+
+        print("=> Write '@' or 'clear' to clear the display")
+        print("=> Write '#' or 'exit' to go back to main menu (Category selection menu)")
+
+        choice = input("Write your choice: ")
+
+        if choice in index_site_mapping.keys():
+            return index_site_mapping[choice]
+        elif choice in ["@", "clear"]:
+            clear_screen()
+            continue
+        elif choice in ["#", "exit"]:
+            return False
+        else:
+            print("Invalid choice. Write again...\n")
+            continue
