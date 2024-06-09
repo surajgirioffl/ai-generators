@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 23rd May 2024
-Last-modified: 27th May 2024
+Last-modified: 10th June 2024
 Error-series: 1100
 """
 
@@ -33,27 +33,20 @@ SETTINGS: dict = tools.load_settings("config.json")
 tools.create_app_require_directories(APP_REQUIRED_DIRS)
 tools.configure_logging(SETTINGS["logging_location"])
 
-driver = tools.get_webdriver_instance(profile_dir_path=f"{os.getcwd()}/appdata/profile")
-driver.maximize_window()
 
-wordhero = WordHero(driver)
-wordhero.login_to_wordhero(SETTINGS["wordhero_credentials"]["email"], SETTINGS["wordhero_credentials"]["password"])
-# wordhero.fetch_all_blog_tools()
+def main(site_preferences: dict, driver=None, *args, **kwargs):
+    local_webdriver = False
+    if not driver:
+        driver = tools.get_webdriver_instance(profile_dir_path=f"{os.getcwd()}/appdata/profile")
+        driver.maximize_window()
+        local_webdriver = True
 
-wordhero.generate_article("what doesn't work in nutrition related to weight loss", "funny", 2000)
-driver.quit()
-exit()
+    wordhero = WordHero(driver)
+    if site_preferences.get("login_required"):
+        wordhero.login_to_wordhero(SETTINGS["wordhero_credentials"]["email"], SETTINGS["wordhero_credentials"]["password"])
 
-flag = True
-while True:
-    prompt = input("Write prompt: ").strip()
-    if flag:
-        response = wordhero.generate_content_with_chat(prompt)
-        flag = False
-    else:
-        response = wordhero.generate_content_with_chat(prompt, new_chat=False)
+    wordhero.generate_article(**site_preferences["options"])
 
-    print(response)
-    print()
-    print(f"Last response: {response[prompt]}")
-    print()
+    # Quitting the driver instance if local_webdriver
+    if local_webdriver:
+        driver.quit()
