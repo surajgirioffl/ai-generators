@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 20th May 2024
-Last-modified: 22th May 2024
+Last-modified: 10th June 2024
 Error-series: 1600
 """
 
@@ -161,11 +161,13 @@ class Ideogram:
         logging.info("Fetched all images links successfully.")
         return list(set(links))
 
-    def create_image_with_prompt(self, prompt: str):
+    def create_image_with_prompt(self, prompt: str, *args, **kwargs):
         """Function that creates an image with the provided prompt.
 
         Args:
             prompt (str): The prompt text to be used for generating the image.
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
 
         Returns:
             None
