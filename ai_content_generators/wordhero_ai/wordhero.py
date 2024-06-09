@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 23rd May 2024
-Last-modified: 27th May 2024
+Last-modified: 10th June 2024
 Error-series: 1200
 """
 
@@ -195,7 +195,7 @@ class WordHero:
 
         return prompt_response_dict
 
-    def generate_article(self, headline: str, tone: str, number_of_words: int) -> tuple[str, dict]:
+    def generate_article(self, headline: str, tone: str, number_of_words: int, *args, **kwargs) -> tuple[str, dict]:
         """Generate an article based on the provided headline, tone, and number of words.
 
         Parameters:
