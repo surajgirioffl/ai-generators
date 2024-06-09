@@ -1,12 +1,12 @@
 ###Default_location_start###
-default_prompt_file_location=prompt.txt
+default_prompt_file_location=prompt.txt (deprecated)
 default_image_location=E:\Wallpapers\Suraj Giri Favorite Background\DesktopBackground\02 gettyimages-863671188_resized.jpg
 default_output_location_local=output
 default_log_location_local=appdata/script.log
 ###Default_location_end###
 
 ###options_start###
-use_prompts=Y
+use_prompts=Y (deprecated)
 ###options_location_end###
 
 ###google_login_options_start###
