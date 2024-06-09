@@ -161,48 +161,63 @@ def main(
         Literal[False] | None: False if the user selects to exit the program, otherwise None.
     """
     while True:
-        start_from_top = False  # variable to check if the user wants to start from the top again
+        try:
+            while True:
+                start_from_top = False  # variable to check if the user wants to start from the top again
 
-        selected_category = category_selector_menu(categories)
-        if not selected_category:
-            return False
+                selected_category = category_selector_menu(categories)
+                if not selected_category:
+                    return False
 
-        while True:
-            selected_site = site_selector_menu(categories_sites_mapping[selected_category], selected_category)
-            if not selected_site:
-                # Back to main menu (category selection menu)
-                start_from_top = True
+                while True:
+                    selected_site = site_selector_menu(categories_sites_mapping[selected_category], selected_category)
+                    if not selected_site:
+                        # Back to main menu (category selection menu)
+                        start_from_top = True
+                        break
+
+                    selected_prompt = prompt_selector_menu(prompts, selected_site)
+                    if selected_prompt is False:
+                        continue
+                    break
+
+                if start_from_top:
+                    continue
                 break
 
-            selected_prompt = prompt_selector_menu(prompts, selected_site)
-            if selected_prompt is False:
-                continue
-            break
+            # Updating prompt for the selected site
+            if "prompt" in sites_preferences[selected_category][selected_site]["options"].keys():
+                # BTW Above condition is not required. If prompt key doesn't exist then 'prompt' key will created and accepted by **kwargs of the function which accept this site options as args.
+                sites_preferences[selected_category][selected_site]["options"]["prompt"] = selected_prompt
 
-        if start_from_top:
-            continue
-        break
+            category_package_name_mapping: dict[str, str] = {
+                "text_to_video": "ai_video_generators",
+                "image_to_video": "ai_video_generators",
+                "text_to_image": "ai_image_generators",
+                "text_to_text": "ai_content_generators",
+            }
 
-    # Updating prompt for the selected site
-    if "prompt" in sites_preferences[selected_category][selected_site]["options"].keys():
-        # BTW Above condition is not required. If prompt key doesn't exist then 'prompt' key will created and accepted by **kwargs of the function which accept this site options as args.
-        sites_preferences[selected_category][selected_site]["options"]["prompt"] = selected_prompt
+            logging.info("======================Starting a new AI Generation =======================")
+            logging.info(f"Category: {selected_category} | Site: {selected_site} | Prompt: {selected_prompt}")
+            print("Starting a new AI Generation")
+            print(f"Category: {selected_category} | Site: {selected_site}")
 
-    category_package_name_mapping: dict[str, str] = {
-        "text_to_video": "ai_video_generators",
-        "image_to_video": "ai_video_generators",
-        "text_to_image": "ai_image_generators",
-        "text_to_text": "ai_content_generators",
-    }
+            module = f"{category_package_name_mapping[selected_category]}.{selected_site}_ai.main"
+            module = importlib.import_module(module)
+            status: bool = module.main(site_preferences=sites_preferences[selected_category][selected_site], driver=driver, *args, **kwargs)
 
-    logging.info("======================Starting a new AI Generation =======================")
-    logging.info(f"Category: {selected_category} | Site: {selected_site} | Prompt: {selected_prompt}")
+            if status:
+                logging.info("======================AI Generation Completed | STATUS -> SUCCESS =======================")
+                print("AI Generation Completed | STATUS -> SUCCESS")
+            else:
+                logging.warning("======================AI Generation Failed | STATUS -> FAILED =======================")
+                print("AI Generation Failed | STATUS -> FAILED")
 
-    module = f"{category_package_name_mapping[selected_category]}.{selected_site}_ai.main"
-    module = importlib.import_module(module)
-    status: bool = module.main(site_preferences=sites_preferences[selected_category][selected_site], driver=driver, *args, **kwargs)
+        except Exception as e:
+            print("Exception: ", e)
+            print("Error Code: 2210")
+            logging.exception(f"Error Code 2210. Exception: {str(e)}")
+            input("Press enter key to continue...")
 
-    if status:
-        logging.info("======================AI Generation Completed | STATUS -> SUCCESS =======================")
-    else:
-        logging.warning("======================AI Generation Failed | STATUS -> FAILED =======================")
+        else:
+            input("Press enter key to continue...")
