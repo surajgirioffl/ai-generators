@@ -33,6 +33,21 @@ tools.configure_logging(SETTINGS["logging_location"])
 
 
 def main(site_preferences: dict, driver=None, *args, **kwargs):
+    """
+    A function that generates an article using WordHero based on site preferences.
+
+    Parameters:
+        site_preferences (dict): A dictionary containing preferences for the site.
+        driver (WebDriver, optional): An instance of a WebDriver, defaults to None. If not passed then local web driver will be created.
+        *args: Additional positional arguments.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        bool: True if the article is generated successfully, False otherwise.
+
+    More Info:
+        - site_preferences will like: {"login_required": True, "options": {"title": "Title of the article", "description": "Description of the article", "keywords": "Keywords of the article"}}
+    """
     local_webdriver = False
     if not driver:
         driver = tools.get_webdriver_instance(profile_dir_path=f"{os.getcwd()}/appdata/profile")
@@ -52,3 +67,4 @@ def main(site_preferences: dict, driver=None, *args, **kwargs):
     # Quitting the driver instance if local_webdriver
     if local_webdriver:
         driver.quit()
+    return True
