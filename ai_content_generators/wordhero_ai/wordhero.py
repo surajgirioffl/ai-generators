@@ -206,6 +206,11 @@ class WordHero:
         Returns:
             tuple[str, dict]: A tuple containing the generated article as a string and a dictionary of prompt responses.
         """
+        if not headline and tone and number_of_words:
+            logging.error("Please provide a valid headline, tone and number of words. Error Code: 1202")
+            logging.error("headline, tone and number_of_words are required parameters. If any one is missing, this error will be raised.")
+            raise ValueError("Please provide a valid headline, tone and number of words. Error Code: 1202")
+
         engine = inflect.engine()  # for ordinal number (1st, 2nd, etc.)
         number_of_part = number_of_words // 500
         article: str = ""
