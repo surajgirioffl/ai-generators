@@ -171,8 +171,17 @@ class Ideogram:
 
         Returns:
             None
+
+        Raises:
+            ValueError: If prompt is not provided.
         """
         logging.info("Creating image with prompt...")
+
+        if not prompt:
+            logging.error("Please provide a prompt. Error Code: 1602")
+            logging.error("prompt is required parameters. If it is missing, this error will be raised.")
+            raise ValueError("Please provide a valid prompt. Error Code: 1602")
+
         if "ideogram.ai/t/" not in self.driver.current_url:
             logging.info("Navigating to ideogram.ai/t/top/1")
             self.driver.get("https://ideogram.ai/t/top/1")
