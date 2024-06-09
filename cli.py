@@ -137,3 +137,71 @@ def prompt_selector_menu(prompts: list[str], selected_site: str) -> str | Litera
         else:
             print("Invalid choice. Write again...\n")
             continue
+
+
+def main(
+    categories: list, categories_sites_mapping: dict, sites_preferences: dict, prompts: list, driver=None, *args, **kwargs
+) -> Literal[False] | None:
+    """
+    A function that handles the main logic of the program.
+    It iterates through category, site, and prompt selection menus until a user choice is made.
+    It then dynamically imports and executes modules based on the selected category to generate AI content.
+
+    Parameters:
+        categories (list): A list of available categories.
+        categories_sites_mapping (dict): A dictionary mapping categories to sites.
+        sites_preferences (dict): A dictionary containing preferences for each site.
+        prompts (list): A list of available prompts.
+        driver (optional): An optional driver object.
+        *args: Additional positional arguments.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Literal[False] | None: False if the user selects to exit the program, otherwise None.
+    """
+    while True:
+        start_from_top = False  # variable to check if the user wants to start from the top again
+
+        selected_category = category_selector_menu(categories)
+        if not selected_category:
+            return False
+
+        while True:
+            selected_site = site_selector_menu(categories_sites_mapping[selected_category], selected_category)
+            if not selected_site:
+                # Back to main menu (category selection menu)
+                start_from_top = True
+                break
+
+            selected_prompt = prompt_selector_menu(prompts, selected_site)
+            if selected_prompt is False:
+                continue
+            break
+
+        if start_from_top:
+            continue
+        break
+
+    # ai_video_generators package
+    if selected_category == "text_to_video":
+        module = f"ai_video_generators.{selected_site}_ai.main"
+        module = importlib.import_module(module)
+        module.main(site_preferences=sites_preferences[selected_category][selected_site], driver=driver, *args, **kwargs)
+
+    # ai_video_generators package
+    if selected_category == "image_to_video":
+        module = f"ai_video_generators.{selected_site}_ai.main"
+        module = importlib.import_module(module)
+        module.main(site_preferences=sites_preferences[selected_category][selected_site], driver=driver, *args, **kwargs)
+
+    # ai_image_generators package
+    if selected_category == "text_to_image":
+        module = f"ai_image_generators.{selected_site}_ai.main"
+        module = importlib.import_module(module)
+        module.main(site_preferences=sites_preferences[selected_category][selected_site], driver=driver, *args, **kwargs)
+
+    # ai_content_generator package ✅
+    if selected_category == "text_to_text":
+        module = f"ai_content_generators.{selected_site}_ai.main"
+        module = importlib.import_module(module)
+        module.main(site_preferences=sites_preferences[selected_category][selected_site], driver=driver, *args, **kwargs)
