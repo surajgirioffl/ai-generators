@@ -47,7 +47,16 @@ class AIGenerator(toga.App):
         prompts_dropdown = toga.Selection(items=[], style=dropdown_style)
 
         # 5. Submit Button widget
-        button_style = Pack(width=100, padding_top=30, padding_bottom=30, padding_left=30, padding_right=30)
+        button_style = Pack(
+            width=100,
+            padding_top=30,
+            padding_bottom=30,
+            padding_left=30,
+            padding_right=30,
+            font_size=15,
+            font_weight="bold",
+            color="green",
+        )
         submit_button = toga.Button(text="Submit", style=button_style)
         ### Widgets_End ###
 
