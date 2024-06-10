@@ -100,7 +100,7 @@ class AIGenerator(toga.App):
         if sites:
             self.sites_dropdown.items = [site.title() for site in sites]
         else:
-            self.sites_dropdown.items = []
+            self.sites_dropdown.items = [""]
 
     def on_submit(self, widget):
         """
