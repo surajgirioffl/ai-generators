@@ -63,7 +63,7 @@ class AIGenerator(toga.App):
             font_weight="bold",
             color="green",
         )
-        submit_button = toga.Button(text="Submit", style=button_style, on_press=self.on_submit)
+        self.submit_button = toga.Button(text="Submit", style=button_style, on_press=self.on_submit)
 
         # Creating a box to hold the widgets. We can create as many to create layout.
         style = Pack(direction=COLUMN, padding=10, width=600, alignment="center")
@@ -73,7 +73,7 @@ class AIGenerator(toga.App):
         self.box.add(box_heading)
         self.box.add(generation_category_label)
         self.box.add(self.generation_category_dropdown, sites_label, self.sites_dropdown, prompts_label, self.prompts_dropdown)
-        self.box.add(submit_button)
+        self.box.add(self.submit_button)
 
         # Adding the box as the content of the main window
         self.main_window.content = self.box
@@ -124,6 +124,9 @@ class AIGenerator(toga.App):
         selected_category = self.generation_category_dropdown.value.lower().replace(" ", "_")
         selected_site = self.sites_dropdown.value.lower().replace(" ", "_")
         selected_prompt = self.prompts_dropdown.value
+
+        # Started performing operations based on selected values
+        self.submit_button.enabled = False  # Disabling the submit button until content is generated
 
     def set_attributes(self, categories: list, categories_sites_mapping: dict, sites_preferences: dict, prompts: list, driver=None):
         self.categories: list = categories
