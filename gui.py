@@ -20,30 +20,60 @@ __description__ = "A browser automation project that uses various AI generation 
 class AIGenerator(toga.App):
     def startup(self) -> None:
         # Creating main window
-        self.main_window = toga.MainWindow(title=self.formal_name, size=(800, 800))
+        self.main_window = toga.MainWindow(title=self.formal_name, size=(600, 600))
 
         ### Widgets_Start ###
-        # Creating initial widgets
-        heading_style = Pack(color="black", text_align="center", font_size=30, font_weight="bold", width=800)
+        # 1. Creating initial widgets
+        heading_style = Pack(color="black", text_align="center", font_size=30, font_weight="bold", width=600)
         box_heading = toga.Label(text=__application_name__, style=heading_style)
 
-        # Generation Category widget
+        # 2. Generation Category widget
         normal_label_style = Pack(color="black", font_size=15, font_weight="bold", text_align="center", padding_top=30)
-        generation_category_label = toga.Label(text="Select Generation Category", style=normal_label_style)
+        generation_category_label = toga.Label(text="Select AI Generation Category", style=normal_label_style)
+        # 2.1 Generation Category dropdown
+        dropdown_style = Pack(font_size=15, font_weight="bold", text_align="center", padding_top=5, padding_left=50, padding_right=50)
+        generation_category_dropdown = toga.Selection(
+            items=[category.replace("_", " ").title() for category in self.categories], style=dropdown_style
+        )
+
+        # 3. Sites dropdown widget
+        sites_label = toga.Label(text="Select AI Generation Category", style=normal_label_style)
+        # 3.1 Generation Category dropdown
+        sites_dropdown = toga.Selection(items=[], style=dropdown_style)
+
+        # 4. Prompt dropdown widget
+        prompts_label = toga.Label(text="Select AI Generation Category", style=normal_label_style)
+        # 4.1 Generation Category dropdown
+        prompts_dropdown = toga.Selection(items=[], style=dropdown_style)
+
+        # 5. Submit Button widget
+        button_style = Pack(width=100, padding_top=30, padding_bottom=30, padding_left=30, padding_right=30)
+        submit_button = toga.Button(text="Submit", style=button_style)
         ### Widgets_End ###
 
         # Creating a box to hold the widgets. We can create as many to create layout.
-        style = Pack(direction=COLUMN, padding=10, width=800)
+        style = Pack(direction=COLUMN, padding=10, width=600)
         self.box = toga.Box(style=style)
 
         # Adding widgets to the box
         self.box.add(box_heading)
         self.box.add(generation_category_label)
+        self.box.add(generation_category_dropdown)
+        self.box.add(sites_label, sites_dropdown, prompts_label, prompts_dropdown)
+        self.box.add(submit_button)
+
         # Adding the box as the content of the main window
         self.main_window.content = self.box
 
         # Displaying the main window
         self.main_window.show()
+
+    def set_attributes(self, categories: list, categories_sites_mapping: dict, sites_preferences: dict, prompts: list, driver=None):
+        self.categories: list = categories
+        self.categories_sites_mapping: dict = categories_sites_mapping
+        self.sites_preferences: dict = sites_preferences
+        self.prompts: list = prompts
+        self.driver = driver
 
 
 def main(
@@ -85,6 +115,7 @@ def main(
         icon = toga.Icon(icon_path)
 
     app = AIGenerator(app_name, app_id, author=__author__, version=__version__, description=__description__, icon=icon, home_page=home_page)
+    app.set_attributes(categories, categories_sites_mapping, sites_preferences, prompts, driver)
     app.main_loop()
 
 
