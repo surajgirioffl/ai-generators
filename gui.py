@@ -126,8 +126,13 @@ class AIGenerator(toga.App):
 
         # Prompt is not compulsory
 
+        # Fetching selected values
+        selected_category = self.generation_category_dropdown.value.lower().replace(" ", "_")
+        selected_site = self.sites_dropdown.value.lower().replace(" ", "_")
+        selected_prompt = self.prompts_dropdown.value
+
         self.message_label.style.color = "green"
-        self.message_label.text = "Good"
+        self.message_label.text = f"Category: {selected_category} | Site: {selected_site} | Prompt: {selected_prompt}"
 
     def set_attributes(self, categories: list, categories_sites_mapping: dict, sites_preferences: dict, prompts: list, driver=None):
         self.categories: list = categories
@@ -148,7 +153,7 @@ def main(
     icon_path: str | None = None,
     home_page: str = "https://github.com/surajgirioffl/ai-generators",
     *args,
-    **kwargs
+    **kwargs,
 ) -> None:
     """
     A function that handles the main logic of the program.
