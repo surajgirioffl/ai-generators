@@ -37,12 +37,12 @@ class AIGenerator(toga.App):
         )
 
         # 3. Sites dropdown widget
-        sites_label = toga.Label(text="Select AI Generation Category", style=normal_label_style)
+        sites_label = toga.Label(text="Select Site", style=normal_label_style)
         # 3.1 Generation Category dropdown
         sites_dropdown = toga.Selection(items=[], style=dropdown_style)
 
         # 4. Prompt dropdown widget
-        prompts_label = toga.Label(text="Select AI Generation Category", style=normal_label_style)
+        prompts_label = toga.Label(text="Select Prompt", style=normal_label_style)
         # 4.1 Generation Category dropdown
         prompts_dropdown = toga.Selection(items=[], style=dropdown_style)
 
