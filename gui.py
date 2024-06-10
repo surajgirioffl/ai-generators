@@ -32,19 +32,21 @@ class AIGenerator(toga.App):
         generation_category_label = toga.Label(text="Select AI Generation Category", style=normal_label_style)
         # 2.1 Generation Category dropdown
         dropdown_style = Pack(font_size=15, font_weight="bold", text_align="center", padding_top=5, padding_left=50, padding_right=50)
-        generation_category_dropdown = toga.Selection(
-            items=[category.replace("_", " ").title() for category in self.categories], style=dropdown_style
+        self.generation_category_dropdown = toga.Selection(
+            items=[category.replace("_", " ").title() for category in self.categories],
+            style=dropdown_style,
+            on_change=self.on_category_change,
         )
 
         # 3. Sites dropdown widget
         sites_label = toga.Label(text="Select Site", style=normal_label_style)
         # 3.1 Generation Category dropdown
-        sites_dropdown = toga.Selection(items=[], style=dropdown_style)
+        self.sites_dropdown = toga.Selection(items=[], style=dropdown_style)
 
         # 4. Prompt dropdown widget
         prompts_label = toga.Label(text="Select Prompt", style=normal_label_style)
         # 4.1 Generation Category dropdown
-        prompts_dropdown = toga.Selection(items=[], style=dropdown_style)
+        self.prompts_dropdown = toga.Selection(items=self.prompts, style=dropdown_style)
 
         # 5. Submit Button widget
         button_style = Pack(
@@ -67,8 +69,7 @@ class AIGenerator(toga.App):
         # Adding widgets to the box
         self.box.add(box_heading)
         self.box.add(generation_category_label)
-        self.box.add(generation_category_dropdown)
-        self.box.add(sites_label, sites_dropdown, prompts_label, prompts_dropdown)
+        self.box.add(self.generation_category_dropdown, sites_label, self.sites_dropdown, prompts_label, self.prompts_dropdown)
         self.box.add(submit_button)
 
         # Adding the box as the content of the main window
@@ -76,6 +77,23 @@ class AIGenerator(toga.App):
 
         # Displaying the main window
         self.main_window.show()
+
+    def on_category_change(self, widget):
+        """
+        A function that handles the event when the category selection changes.
+
+        Parameters:
+            widget: the widget object triggering the event
+
+        Returns:
+            None
+        """
+        selected_category = widget.value.lower().replace(" ", "_")
+        sites: list | None = self.categories_sites_mapping.get(selected_category)
+        if sites:
+            self.sites_dropdown.items = [site.title() for site in sites]
+        else:
+            self.sites_dropdown.items = []
 
     def set_attributes(self, categories: list, categories_sites_mapping: dict, sites_preferences: dict, prompts: list, driver=None):
         self.categories: list = categories
