@@ -7,6 +7,8 @@ Last-modified: 10th June 2024
 Error-series: 2300
 """
 
+import logging
+import importlib
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW, CENTER
@@ -128,12 +130,62 @@ class AIGenerator(toga.App):
         # Started performing operations based on selected values
         self.submit_button.enabled = False  # Disabling the submit button until content is generated
 
-    def set_attributes(self, categories: list, categories_sites_mapping: dict, sites_preferences: dict, prompts: list, driver=None):
+        # Performing AI generation
+        self.perform_ai_generation_operation(selected_category, selected_site, selected_prompt)
+
+        self.submit_button.enabled = True  # Enabling the submit button after content is generated
+
+    def perform_ai_generation_operation(self, selected_category: str, selected_site: str, selected_prompt: str):
+        """
+        A function to perform an AI generation operation with the given parameters.
+
+        Parameters:
+            self (obj): The instance of the class.
+            selected_category (str): The selected category for the AI generation operation.
+            selected_site (str): The selected site for the AI generation operation.
+            selected_prompt (str): The prompt selected for the AI generation operation.
+
+        Returns:
+            None
+        """
+        # Updating prompt for the selected site
+        if "prompt" in self.sites_preferences[selected_category][selected_site]["options"].keys():
+            # BTW Above condition is not required. If prompt key doesn't exist then 'prompt' key will created and accepted by **kwargs of the function which accept this site options as args.
+            self.sites_preferences[selected_category][selected_site]["options"]["prompt"] = selected_prompt
+
+        category_package_name_mapping: dict[str, str] = {
+            "text_to_video": "ai_video_generators",
+            "image_to_video": "ai_video_generators",
+            "text_to_image": "ai_image_generators",
+            "text_to_text": "ai_content_generators",
+        }
+
+        logging.info("======================Starting a new AI Generation (With GUI Interface)=======================")
+        logging.info(f"Category: {selected_category} | Site: {selected_site} | Prompt: {selected_prompt}")
+
+        module = f"{category_package_name_mapping[selected_category]}.{selected_site}_ai.main"
+        module = importlib.import_module(module)
+        status: bool = module.main(
+            site_preferences=self.sites_preferences[selected_category][selected_site], driver=self.driver, *self.args, **self.kwargs
+        )
+
+        if status:
+            logging.info("======================AI Generation Completed | STATUS -> SUCCESS =======================")
+            self.main_window.info_dialog("Success", "AI Generation Completed Successfully")
+        else:
+            logging.warning("======================AI Generation Failed | STATUS -> FAILED =======================")
+            self.main_window.error_dialog("Failed", "AI Generation Failed.")
+
+    def set_attributes(
+        self, categories: list, categories_sites_mapping: dict, sites_preferences: dict, prompts: list, driver=None, *args, **kwargs
+    ):
         self.categories: list = categories
         self.categories_sites_mapping: dict = categories_sites_mapping
         self.sites_preferences: dict = sites_preferences
         self.prompts: list = prompts
         self.driver = driver
+        self.args = args
+        self.kwargs = kwargs
 
 
 def main(
@@ -175,7 +227,7 @@ def main(
         icon = toga.Icon(icon_path)
 
     app = AIGenerator(app_name, app_id, author=__author__, version=__version__, description=__description__, icon=icon, home_page=home_page)
-    app.set_attributes(categories, categories_sites_mapping, sites_preferences, prompts, driver)
+    app.set_attributes(categories, categories_sites_mapping, sites_preferences, prompts, driver, *args, **kwargs)
     app.main_loop()
 
 
