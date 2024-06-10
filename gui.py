@@ -32,8 +32,10 @@ class AIGenerator(toga.App):
         generation_category_label = toga.Label(text="Select AI Generation Category", style=normal_label_style)
         # 2.1 Generation Category dropdown
         dropdown_style = Pack(font_size=15, font_weight="bold", text_align="center", padding_top=5, padding_left=50, padding_right=50)
+        categories = [category.replace("_", " ").title() for category in self.categories]
+        categories.insert(0, "")  # Inserting an empty prompt at the beginning
         self.generation_category_dropdown = toga.Selection(
-            items=[category.replace("_", " ").title() for category in self.categories],
+            items=categories,
             style=dropdown_style,
             on_change=self.on_category_change,
         )
@@ -46,7 +48,9 @@ class AIGenerator(toga.App):
         # 4. Prompt dropdown widget
         prompts_label = toga.Label(text="Select Prompt", style=normal_label_style)
         # 4.1 Generation Category dropdown
-        self.prompts_dropdown = toga.Selection(items=self.prompts, style=dropdown_style)
+        prompts = self.prompts.copy()
+        prompts.insert(0, "")  # Inserting an empty prompt at the beginning
+        self.prompts_dropdown = toga.Selection(items=prompts, style=dropdown_style)
 
         # 5. Submit Button widget
         button_style = Pack(
@@ -59,7 +63,10 @@ class AIGenerator(toga.App):
             font_weight="bold",
             color="green",
         )
-        submit_button = toga.Button(text="Submit", style=button_style)
+        submit_button = toga.Button(text="Submit", style=button_style, on_press=self.on_submit)
+
+        # 6. Message widget
+        self.message_label = toga.Label(text="", style=normal_label_style)
         ### Widgets_End ###
 
         # Creating a box to hold the widgets. We can create as many to create layout.
@@ -70,7 +77,7 @@ class AIGenerator(toga.App):
         self.box.add(box_heading)
         self.box.add(generation_category_label)
         self.box.add(self.generation_category_dropdown, sites_label, self.sites_dropdown, prompts_label, self.prompts_dropdown)
-        self.box.add(submit_button)
+        self.box.add(submit_button, self.message_label)
 
         # Adding the box as the content of the main window
         self.main_window.content = self.box
