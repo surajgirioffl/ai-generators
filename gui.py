@@ -8,14 +8,42 @@ Error-series: 2300
 """
 
 import toga
+from toga.style import Pack
+from toga.style.pack import COLUMN, ROW, CENTER
 
 __author__ = "Suraj Kumar Giri"
 __version__ = "0.0.0"
+__application_name__ = "AI GENERATOR"
 __description__ = "A browser automation project that uses various AI generation sites to generate videos, images, and text with various options and customizations."
 
 
 class AIGenerator(toga.App):
-    pass
+    def startup(self) -> None:
+        # Creating main window
+        self.main_window = toga.MainWindow(title=self.formal_name, size=(800, 800))
+
+        ### Widgets_Start ###
+        # Creating initial widgets
+        heading_style = Pack(color="black", text_align="center", font_size=30, font_weight="bold", width=800)
+        box_heading = toga.Label(text=__application_name__, style=heading_style)
+
+        # Generation Category widget
+        normal_label_style = Pack(color="black", font_size=15, font_weight="bold", text_align="center", padding_top=30)
+        generation_category_label = toga.Label(text="Select Generation Category", style=normal_label_style)
+        ### Widgets_End ###
+
+        # Creating a box to hold the widgets. We can create as many to create layout.
+        style = Pack(direction=COLUMN, padding=10, width=800)
+        self.box = toga.Box(style)
+
+        # Adding widgets to the box
+        self.box.add(box_heading)
+        self.box.add(generation_category_label)
+        # Adding the box as the content of the main window
+        self.main_window.content = self.box
+
+        # Displaying the main window
+        self.main_window.show()
 
 
 def main(
