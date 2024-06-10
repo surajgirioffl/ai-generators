@@ -3,7 +3,7 @@
 GUI module to provide Graphical User Interface for the application.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 09th June 2024
-Last-modified: 10th June 2024
+Last-modified: 11th June 2024
 Error-series: 2300
 """
 
@@ -11,7 +11,7 @@ import logging
 import importlib
 import toga
 from toga.style import Pack
-from toga.style.pack import COLUMN, ROW, CENTER
+from toga.style.pack import COLUMN
 
 __author__ = "Suraj Kumar Giri"
 __version__ = "0.0.0"
