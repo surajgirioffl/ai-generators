@@ -34,7 +34,7 @@ class AIGenerator(toga.App):
 
         # Creating a box to hold the widgets. We can create as many to create layout.
         style = Pack(direction=COLUMN, padding=10, width=800)
-        self.box = toga.Box(style)
+        self.box = toga.Box(style=style)
 
         # Adding widgets to the box
         self.box.add(box_heading)
