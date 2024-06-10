@@ -65,12 +65,6 @@ class AIGenerator(toga.App):
         )
         submit_button = toga.Button(text="Submit", style=button_style, on_press=self.on_submit)
 
-        # 6. Message widget
-        message_container = toga.ScrollContainer(content="", style=normal_label_style)
-        self.message_label = toga.Label(text="", style=normal_label_style)
-        message_container.content = self.message_label
-        ### Widgets_End ###
-
         # Creating a box to hold the widgets. We can create as many to create layout.
         style = Pack(direction=COLUMN, padding=10, width=600, alignment="center")
         self.box = toga.Box(style=style)
@@ -79,7 +73,7 @@ class AIGenerator(toga.App):
         self.box.add(box_heading)
         self.box.add(generation_category_label)
         self.box.add(self.generation_category_dropdown, sites_label, self.sites_dropdown, prompts_label, self.prompts_dropdown)
-        self.box.add(submit_button, message_container)
+        self.box.add(submit_button)
 
         # Adding the box as the content of the main window
         self.main_window.content = self.box
@@ -116,14 +110,12 @@ class AIGenerator(toga.App):
         """
         # Checking if any category is not selected.
         if not self.generation_category_dropdown.value:
-            self.message_label.style.color = "red"
-            self.message_label.text = "Please select a category"
+            self.main_window.error_dialog("Error", "Please select a category")
             return
 
         # Checking if any site is not selected.
         if not self.sites_dropdown.value:
-            self.message_label.style.color = "red"
-            self.message_label.text = "Please select a site"
+            self.main_window.error_dialog("Error", "Please select a site")
             return
 
         # Prompt is not compulsory
@@ -132,9 +124,6 @@ class AIGenerator(toga.App):
         selected_category = self.generation_category_dropdown.value.lower().replace(" ", "_")
         selected_site = self.sites_dropdown.value.lower().replace(" ", "_")
         selected_prompt = self.prompts_dropdown.value
-
-        self.message_label.style.color = "green"
-        self.message_label.text = f"Category: {selected_category} | Site: {selected_site} | Prompt: {selected_prompt}"
 
     def set_attributes(self, categories: list, categories_sites_mapping: dict, sites_preferences: dict, prompts: list, driver=None):
         self.categories: list = categories
