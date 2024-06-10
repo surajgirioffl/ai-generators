@@ -52,7 +52,7 @@ class AIGenerator(toga.App):
         ### Widgets_End ###
 
         # Creating a box to hold the widgets. We can create as many to create layout.
-        style = Pack(direction=COLUMN, padding=10, width=600)
+        style = Pack(direction=COLUMN, padding=10, width=600, alignment="center")
         self.box = toga.Box(style=style)
 
         # Adding widgets to the box
