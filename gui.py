@@ -102,6 +102,33 @@ class AIGenerator(toga.App):
         else:
             self.sites_dropdown.items = []
 
+    def on_submit(self, widget):
+        """
+        A method that handles the submit event for the submit button.
+
+        Parameters:
+            widget: The widget triggering the submit event.
+
+        Returns:
+            None
+        """
+        # Checking if any category is not selected.
+        if not self.generation_category_dropdown.value:
+            self.message_label.style.color = "red"
+            self.message_label.text = "Please select a category"
+            return
+
+        # Checking if any site is not selected.
+        if not self.sites_dropdown.value:
+            self.message_label.style.color = "red"
+            self.message_label.text = "Please select a site"
+            return
+
+        # Prompt is not compulsory
+
+        self.message_label.style.color = "green"
+        self.message_label.text = "Good"
+
     def set_attributes(self, categories: list, categories_sites_mapping: dict, sites_preferences: dict, prompts: list, driver=None):
         self.categories: list = categories
         self.categories_sites_mapping: dict = categories_sites_mapping
