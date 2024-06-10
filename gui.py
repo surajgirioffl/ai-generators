@@ -66,7 +66,9 @@ class AIGenerator(toga.App):
         submit_button = toga.Button(text="Submit", style=button_style, on_press=self.on_submit)
 
         # 6. Message widget
+        message_container = toga.ScrollContainer(content="", style=normal_label_style)
         self.message_label = toga.Label(text="", style=normal_label_style)
+        message_container.content = self.message_label
         ### Widgets_End ###
 
         # Creating a box to hold the widgets. We can create as many to create layout.
@@ -77,7 +79,7 @@ class AIGenerator(toga.App):
         self.box.add(box_heading)
         self.box.add(generation_category_label)
         self.box.add(self.generation_category_dropdown, sites_label, self.sites_dropdown, prompts_label, self.prompts_dropdown)
-        self.box.add(submit_button, self.message_label)
+        self.box.add(submit_button, message_container)
 
         # Adding the box as the content of the main window
         self.main_window.content = self.box
