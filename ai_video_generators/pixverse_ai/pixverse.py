@@ -159,11 +159,11 @@ def create_video_from_prompt(driver: Chrome | Edge | Any, prompt: str, seed: int
 
 def create_video_from_images(
     driver: Chrome | Edge | Any,
-    image_path: str,
+    image: str,
     motion_strength: float | int | str,
     seed: int | str,
     prompt: str = "",
-    hd=False,
+    hd_quality=False,
     *args,
     **kwargs
 ):
@@ -171,11 +171,11 @@ def create_video_from_images(
 
     Args:
         driver (Chrome | Edge | Any): the driver to use for the operation
-        image_path (str): the path to the images to create the video from
+        image (str): the path to the images to create the video from
         motion_strength (float | int | str): the strength of the motion for the video
         seed: int | str - the seed value for the video creation
         prompt (str): optional prompt for the video creation
-        hd (bool): whether to enable HD quality for the video
+        hd_quality (bool): whether to enable HD quality for the video
         *args: Additional positional arguments.
         **kwargs: Additional keyword arguments.
 
@@ -211,7 +211,7 @@ def create_video_from_images(
     # Image upload button
     # image_upload_button_selector = ".ant-btn.css-1ntsptu.ant-btn-text.ant-btn-sm"
     image_file_input_selector = 'input[type="file"]'
-    wait.until(expected_conditions.presence_of_element_located((By.CSS_SELECTOR, image_file_input_selector))).send_keys(image_path)
+    wait.until(expected_conditions.presence_of_element_located((By.CSS_SELECTOR, image_file_input_selector))).send_keys(image)
     driver.find_element(By.ID, "Prompt").send_keys(prompt)  # Prompt if any
     motion_strength_input_xpath = (
         '//*[@id="root"]/div/div/div[2]/div/main/div[1]/div/div[1]/form/div/div[5]/div[2]/div/div/div/div/div[1]/div/div[2]/input'
@@ -223,10 +223,10 @@ def create_video_from_images(
     driver.find_element(By.XPATH, seed_button_selector).send_keys(seed)
     quality_button = driver.find_element(By.ID, "Quality")
     if quality_button.get_property("aria-checked") == "false":
-        if hd:
+        if hd_quality:
             quality_button.click()  # HD enabled
     else:
-        if not hd:
+        if not hd_quality:
             quality_button.click()  # HD disabled
 
     # Waiting for image to be uploaded
