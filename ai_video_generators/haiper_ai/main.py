@@ -220,7 +220,8 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
         if not is_login_success:
             print("Error: Google login failed. Error Code: 1305")
             logging.error("Google login failed. Error Code: 1305")
-            driver.quit()
+            if local_webdriver:
+                driver.quit()
             return False
 
     # Creating instance of the Haiper class
@@ -237,8 +238,8 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
 
         Returns:
             bool: True if the image option is available, False otherwise.
-            
-        More Info: 
+
+        More Info:
             - Logic is: If the image option is present in the site preferences means user want to generate video using image. So, we will trigger the image based generation flow otherwise we will trigger the prompt based generation flow.
         """
         if "image" in site_preferences["options"].keys():
