@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 29th May 2024
-Last-modified: 29th May 2024
+Last-modified: 11th June 2024
 Error-series: 1400
 """
 
@@ -14,7 +14,11 @@ __version__ = "0.0.0"
 import os
 from time import sleep
 import tools
-from .pixlr import Pixlr
+
+if __name__ == "__main__":
+    from pixlr import Pixlr
+else:
+    from .pixlr import Pixlr
 
 
 PROJECT_DIR = os.path.dirname(__file__)
