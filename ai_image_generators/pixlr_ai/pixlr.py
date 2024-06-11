@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 27th May 2024
-Last-modified: 1st June 2024
+Last-modified: 11th June 2024
 Error-series: 1200
 """
 
@@ -77,6 +77,8 @@ class Pixlr:
         lighting: str = None,
         composition: str = None,
         negative_prompt: str = None,
+        *args,
+        **kwargs,
     ) -> None:
         logging.info("Generating image...")
         if "pixlr.com/image-generator" not in self.driver.current_url:
