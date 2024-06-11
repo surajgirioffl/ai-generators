@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 17th May 2024
-Last-modified: 18th May 2024
+Last-modified: 11th June 2024
 Error-series: 1400
 """
 
@@ -152,13 +152,15 @@ class Haiper:
             self.driver.get("https://haiper.ai/explore")  # Opening the explore page
             return mp4_link
 
-    def create_video_with_prompt(self, prompt: str, seed: str | int, duration: str | int = 2):
+    def create_video_with_prompt(self, prompt: str, seed: str | int, duration: str | int = 2, *args, **kwargs):
         """Create video with the given prompt text, seed value, and optional duration setting.
 
         Parameters:
             prompt (str): The text prompt for the video.
             seed (str | int): The seed value for the video.
             duration (str | int, optional): The duration setting for the video. Defaults to 2 seconds.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
 
         Returns:
             bool: True if video creation is successful, False otherwise.
@@ -193,7 +195,7 @@ class Haiper:
             logging.info("Create button clicked. Generating video.")
             return True
 
-    def create_video_with_image(self, image_path: str, seed: str | int, prompt: str = "", duration: str | int = 2):
+    def create_video_with_image(self, image_path: str, seed: str | int, prompt: str = "", duration: str | int = 2, *args, **kwargs):
         """A function to create a video with an image.
 
         Args:
@@ -201,6 +203,8 @@ class Haiper:
             seed (str | int): The seed for the video creation.
             prompt (str, optional): The prompt to be included. Defaults to ""(empty).
             duration (str | int, optional): The duration of the video. Defaults to 2.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
         """
         logging.info("Creating video with the given image.")
 
