@@ -190,7 +190,7 @@ def login_to_google_with_email_and_password(
         return True
 
 
-def main() -> None:
+def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
     """Driver function to integrate and execute the script.
 
     Returns:
@@ -200,67 +200,69 @@ def main() -> None:
     create_app_require_directories()
     parse_config_file()
     configure_logging(CONFIG["Default_location_start"]["default_log_location_local"])
-    logging.info("-----------------STARTING A NEW SESSION-----------------")
+    logging.info("-----------------STARTING A NEW SESSION (Haiper AI)-----------------")
 
     # ------------------ Main workflow will start from here ---------------------
-    driver = get_webdriver_instance()
-    driver.maximize_window()
-    if CONFIG["google_login_options_start"]["manual_login"] == "Y":
-        is_login_success = login_to_google_account(driver)
-    else:
-        email = CONFIG["google_login_options_start"]["email"]
-        password = CONFIG["google_login_options_start"]["password"]
-        is_login_success = login_to_google_with_email_and_password(driver, email, password)
+    local_webdriver = False
+    if not driver:
+        driver = get_webdriver_instance()
+        driver.maximize_window()
+        local_webdriver = True
 
-    if not is_login_success:
-        print("Error: Google login failed. Error Code: 1305")
-        logging.error("Google login failed. Error Code: 1305")
-        driver.quit()
-        return False
+    if site_preferences.get("login_required"):
+        if CONFIG["google_login_options_start"]["manual_login"] == "Y":
+            is_login_success = login_to_google_account(driver)
+        else:
+            email = CONFIG["google_login_options_start"]["email"]
+            password = CONFIG["google_login_options_start"]["password"]
+            is_login_success = login_to_google_with_email_and_password(driver, email, password)
 
-    option_enabled = False  # Specify if the options are enabled
+        if not is_login_success:
+            print("Error: Google login failed. Error Code: 1305")
+            logging.error("Google login failed. Error Code: 1305")
+            driver.quit()
+            return False
 
     # Creating instance of the Haiper class
     haiper = Haiper(driver)
-    haiper.login_with_google()
+    if site_preferences.get("login_required"):
+        haiper.login_with_google()
 
-    if CONFIG["options_start"]["use_prompts"] == "Y":
-        logging.info("Initiating video generation from prompt...")
-        option_enabled = True
-        seed = CONFIG["video_options_start"]["seed"]
-        duration = CONFIG["video_options_start"]["duration"]
-        prompt_file_location = CONFIG["Default_location_start"]["default_prompt_file_location"]
-        seed = CONFIG["video_options_start"]["seed"]
-        try:
-            with open(prompt_file_location) as file:
-                prompt = file.read()
-        except FileNotFoundError as e:
-            print("Error: Prompt file not found. Error Code: 1307")
-            logging.error("Prompt file not found. Error Code: 1307")
-            logging.error(f"Exception: {e}")
-        else:
-            haiper.create_video_with_prompt(prompt, seed, duration)
-            haiper.download_video(haiper.fetch_generated_video_link(), CONFIG["Default_location_start"]["default_output_location_local"])
+    def is_image_option_available(site_preferences: dict) -> bool:
+        """
+        Check if the image option is available in the site preferences.
 
-    if CONFIG["options_start"]["use_images"] == "Y":
+        Args:
+            sites_preferences (dict): A dictionary containing site preferences.
+
+        Returns:
+            bool: True if the image option is available, False otherwise.
+            
+        More Info: 
+            - Logic is: If the image option is present in the site preferences means user want to generate video using image. So, we will trigger the image based generation flow otherwise we will trigger the prompt based generation flow.
+        """
+        if "image" in site_preferences["options"].keys():
+            return True
+        return False
+
+    if is_image_option_available(site_preferences):
         logging.info("Initiating video generation from images...")
-        option_enabled = True
-        image_path = CONFIG["Default_location_start"]["default_image_location"]
-        seed = CONFIG["video_options_start"]["seed"]
-        duration = CONFIG["video_options_start"]["duration"]
-        haiper.create_video_with_image(image_path, seed, duration=duration)
+        if not site_preferences["options"].get("image"):
+            image = CONFIG["Default_location_start"]["default_image_location"]
+            site_preferences["options"]["image"] = image
+        haiper.create_video_with_image(**site_preferences["options"])
         haiper.download_video(haiper.fetch_generated_video_link(), CONFIG["Default_location_start"]["default_output_location_local"])
 
-    sleep(5000)
+    else:
+        logging.info("Initiating video generation from prompt...")
+        haiper.create_video_with_prompt(**site_preferences["options"])
+        haiper.download_video(haiper.fetch_generated_video_link(), CONFIG["Default_location_start"]["default_output_location_local"])
 
-    print("Operation Completed. Closing the webdriver.")
-    logging.info("Operation Completed. Closing the webdriver.")
-    driver.quit()  # Closing the browser
+    if local_webdriver:
+        logging.info("Operation Completed. Closing the webdriver (Haiper AI)")
+        driver.quit()  # Closing the browser
 
-    if not option_enabled:
-        print("No options are enabled to generate video. Please enable at least one option. Error Code: 1303")
-        logging.info("No options are enabled to generate video. Please enable at least one option. Error Code: 1303")
-        return False
+    logging.info("Operation Completed (Haiper AI)")
     return True
 
 
