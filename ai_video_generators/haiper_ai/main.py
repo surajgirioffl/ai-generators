@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 17th May 2024
-Last-modified: 18th May 2024
+Last-modified: 11th June 2024
 Error-series: 1300
 """
 
@@ -23,7 +23,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
-from .haiper import Haiper
+
+if __name__ == "__main__":
+    from haiper import Haiper
+else:
+    from .haiper import Haiper
 
 PROJECT_DIR = os.path.dirname(__file__)
 os.chdir(PROJECT_DIR)  # Changing the current working directory to the project directory.
