@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 7th May 2024
-Last-modified: 17th May 2024
+Last-modified: 11th June 2024
 Error-series: 1100
 """
 
@@ -190,7 +190,7 @@ def login_to_google_with_email_and_password(
         return True
 
 
-def main() -> None:
+def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
     """Driver function to integrate and execute the script.
 
     Returns:
@@ -200,65 +200,68 @@ def main() -> None:
     create_app_require_directories()
     parse_config_file()
     configure_logging(CONFIG["Default_location_start"]["default_log_location_local"])
-    logging.info("-----------------STARTING A NEW SESSION-----------------")
+    logging.info("-----------------STARTING A NEW SESSION (Pixverse)-----------------")
 
     # ------------------ Main workflow will start from here ---------------------
-    driver = get_webdriver_instance()
-    if CONFIG["google_login_options_start"]["manual_login"] == "Y":
-        is_login_success = login_to_google_account(driver)
-    else:
-        email = CONFIG["google_login_options_start"]["email"]
-        password = CONFIG["google_login_options_start"]["password"]
-        is_login_success = login_to_google_with_email_and_password(driver, email, password)
+    local_webdriver = False
+    if not driver:
+        driver = get_webdriver_instance()
+        local_webdriver = True
 
-    if not is_login_success:
-        print("Error: Google login failed. Error Code: 1105")
-        logging.error("Google login failed. Error Code: 1105")
-        driver.quit()
-        return False
-
-    option_enabled = False  # Specify if the options are enabled
-    pixverse.login_with_google(driver)
-
-    if CONFIG["options_start"]["use_images"] == "Y":
-        logging.info("Initiating video from images...")
-        option_enabled = True
-        image_path = CONFIG["Default_location_start"]["default_image_location"]
-        motion_strength = CONFIG["video_options_start"]["strength_of_motion"]
-        seed = CONFIG["video_options_start"]["seed"]
-        hd = True if CONFIG["video_options_start"]["HD"] == "Y" else False
-        pixverse.create_video_from_images(driver, image_path, motion_strength, seed, hd)
-
-        link = pixverse.fetch_generated_video_link(driver)
-        pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
-
-    if CONFIG["options_start"]["use_prompts"] == "Y":
-        logging.info("Initiating video from prompt...")
-        option_enabled = True
-        prompt_file_location = CONFIG["Default_location_start"]["default_prompt_file_location"]
-        seed = CONFIG["video_options_start"]["seed"]
-        try:
-            with open(prompt_file_location) as file:
-                prompt = file.read()
-        except FileNotFoundError:
-            print("Error: Prompt file not found. Error Code: 1107")
-            logging.error("Prompt file not found. Error Code: 1107")
+    if site_preferences.get("login_required"):
+        if CONFIG["google_login_options_start"]["manual_login"] == "Y":
+            is_login_success = login_to_google_account(driver)
         else:
-            pixverse.create_video_from_prompt(driver, prompt, seed=seed)
+            email = CONFIG["google_login_options_start"]["email"]
+            password = CONFIG["google_login_options_start"]["password"]
+            is_login_success = login_to_google_with_email_and_password(driver, email, password)
 
+        if not is_login_success:
+            print("Error: Google login failed. Error Code: 1105")
+            logging.error("Google login failed. Error Code: 1105")
+            if local_webdriver:
+                driver.quit()
+            return False
+
+    if site_preferences.get("login_required"):
+        pixverse.login_with_google(driver)
+
+    def is_image_option_available(site_preferences: dict) -> bool:
+        """
+        Check if the image option is available in the site preferences.
+
+        Args:
+            sites_preferences (dict): A dictionary containing site preferences.
+
+        Returns:
+            bool: True if the image option is available, False otherwise.
+
+        More Info:
+            - Logic is: If the image option is present in the site preferences means user want to generate video using image. So, we will trigger the image based generation flow otherwise we will trigger the prompt based generation flow.
+        """
+        if "image" in site_preferences["options"].keys():
+            return True
+        return False
+
+    if is_image_option_available(site_preferences):
+        logging.info("Initiating video generation from images...")
+        if not site_preferences["options"].get("image"):
+            image = CONFIG["Default_location_start"]["default_image_location"]
+            site_preferences["options"]["image"] = image
+        pixverse.create_video_from_images(driver, **site_preferences["options"])
+        link = pixverse.fetch_generated_video_link(driver)
+        pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
+    else:
+        logging.info("Initiating video generation from prompt...")
+        pixverse.create_video_from_prompt(driver, **site_preferences["options"])
         link = pixverse.fetch_generated_video_link(driver)
         pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
 
-    sleep(50)
+    print("Operation Completed (Pixverse)")
+    logging.info("Operation Completed (Pixverse)")
 
-    print("Operation Completed. Closing the webdriver.")
-    logging.info("Operation Completed. Closing the webdriver.")
-    driver.quit()  # Closing the browser
-
-    if not option_enabled:
-        print("No options are enabled to generate video. Please enable at least one option. Error Code: 1103")
-        logging.info("No options are enabled to generate video. Please enable at least one option. Error Code: 1103")
-        return False
+    if local_webdriver:
+        driver.quit()  # Closing the browser if local webdriver
     return True
 
 
