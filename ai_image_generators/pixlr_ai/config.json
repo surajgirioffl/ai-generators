@@ -11,6 +11,5 @@
         "lighting": null,
         "composition": null,
         "negative_prompt": false
-    },
-    "login_required": true
+    }
 }
