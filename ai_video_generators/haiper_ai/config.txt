@@ -1,5 +1,5 @@
 ###Default_location_start###
-default_prompt_file_location=prompt.txt
+default_prompt_file_location=prompt.txt (deprecated - Use preferences.xlsx instead)
 default_image_location=E:\Wallpapers\Suraj Giri Favorite Background\DesktopBackground\02 gettyimages-863671188_resized.jpg
 default_output_location_local=output
 default_log_location_local=appdata/script.log
