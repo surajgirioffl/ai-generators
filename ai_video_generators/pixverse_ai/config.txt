@@ -1,19 +1,19 @@
 ###Default_location_start###
-default_prompt_file_location=prompt.txt
+default_prompt_file_location=prompt.txt (deprecated - Use preferences.xlsx instead)
 default_image_location=E:\Wallpapers\My Wallpapers\1900192.jpg
 default_output_location_local=output
 default_log_location_local=appdata/script.log
 ###Default_location_end###
 
 ###options_start###
-use_prompts=N
-use_images=Y
+use_prompts=N (deprecated - Use preferences.xlsx instead)
+use_images=Y (deprecated - Use preferences.xlsx instead)
 ###options_location_end###
 
 ###video_options_start###
-strength_of_motion=298
-seed=1216533113
-HD=Y
+strength_of_motion=298 (deprecated - Use preferences.xlsx instead)
+seed=1216533113 (deprecated - Use preferences.xlsx instead)
+HD=Y (deprecated - Use preferences.xlsx instead)
 ###video_options_end###
 
 ###google_login_options_start###
