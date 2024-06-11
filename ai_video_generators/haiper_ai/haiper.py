@@ -195,11 +195,11 @@ class Haiper:
             logging.info("Create button clicked. Generating video.")
             return True
 
-    def create_video_with_image(self, image_path: str, seed: str | int, prompt: str = "", duration: str | int = 2, *args, **kwargs):
+    def create_video_with_image(self, image: str, seed: str | int, prompt: str = "", duration: str | int = 2, *args, **kwargs):
         """A function to create a video with an image.
 
         Args:
-            image_path (str): The path to the image file.
+            image (str): The path to the image file.
             seed (str | int): The seed for the video creation.
             prompt (str, optional): The prompt to be included. Defaults to ""(empty).
             duration (str | int, optional): The duration of the video. Defaults to 2.
@@ -217,7 +217,7 @@ class Haiper:
             self.wait.until(EC.element_to_be_clickable((By.XPATH, animate_your_image_div_xpath))).click()
 
             # Image upload
-            self.driver.find_element(By.CSS_SELECTOR, 'input[type="file"]').send_keys(image_path)
+            self.driver.find_element(By.CSS_SELECTOR, 'input[type="file"]').send_keys(image)
             if prompt:
                 self.driver.find_element(By.TAG_NAME, "textarea").send_keys(prompt)  # Prompt
 
