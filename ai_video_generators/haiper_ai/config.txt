@@ -1,0 +1,22 @@
+###Default_location_start###
+default_prompt_file_location=prompt.txt
+default_image_location=E:\Wallpapers\Suraj Giri Favorite Background\DesktopBackground\02 gettyimages-863671188_resized.jpg
+default_output_location_local=output
+default_log_location_local=appdata/script.log
+###Default_location_end###
+
+###options_start###
+use_prompts=N
+use_images=Y
+###options_location_end###
+
+###video_options_start###
+seed=1216533113
+duration=2
+###video_options_end###
+
+###google_login_options_start###
+manual_login=N
+email=
+password=
+###google_login_options_end###
