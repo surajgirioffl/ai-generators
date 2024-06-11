@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 9th May 2024
-Last-modified: 14th May 2024
+Last-modified: 11th June 2024
 Error-series: 1200
 """
 
@@ -101,11 +101,11 @@ def fetch_generated_video_link(driver: Chrome | Edge | Any) -> str | bool:
             video_generation_info_div.click()
             sleep(5)
             generated_video_link = driver.current_url
-            
+
             # Now going back to the 'create-video' page
             # driver.find_element(By.CSS_SELECTOR, 'svg[data-icon="arrow-left"]').parent.click()
             arrow_left_svg = driver.find_element(By.CSS_SELECTOR, 'svg[data-icon="arrow-left"]')
-            arrow_left_svg_parent = arrow_left_svg.find_element(By.XPATH, './..')
+            arrow_left_svg_parent = arrow_left_svg.find_element(By.XPATH, "./..")
             arrow_left_svg_parent.click()
             break
 
@@ -127,13 +127,15 @@ def fetch_generated_video_link(driver: Chrome | Edge | Any) -> str | bool:
     return generated_video_public_link
 
 
-def create_video_from_prompt(driver: Chrome | Edge | Any, prompt: str, seed: int | str):
+def create_video_from_prompt(driver: Chrome | Edge | Any, prompt: str, seed: int | str, *args, **kwargs):
     """Creates a video based on a given prompt using the provided driver.
 
     Args:
         driver (Chrome | Edge | Any): The web driver to use for interacting with the webpage.
         prompt (str): The prompt to base the video on.
         seed (int | str): The seed value to use for generating the video.
+        *args: Additional positional arguments.
+        **kwargs: Additional keyword arguments.
 
     Returns:
         None
@@ -162,6 +164,8 @@ def create_video_from_images(
     seed: int | str,
     prompt: str = "",
     hd=False,
+    *args,
+    **kwargs
 ):
     """Function to create video using image.
 
@@ -172,6 +176,8 @@ def create_video_from_images(
         seed: int | str - the seed value for the video creation
         prompt (str): optional prompt for the video creation
         hd (bool): whether to enable HD quality for the video
+        *args: Additional positional arguments.
+        **kwargs: Additional keyword arguments.
 
     Result:
         None
