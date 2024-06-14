@@ -146,8 +146,9 @@ class AIGenerator(toga.App):
             self.main_window.error_dialog("Error", "Please select a category")
             return
 
-        # Checking if any site is not selected.
-        if not self.sites_dropdown.value:
+        # Checking for the selected sites.
+        selected_sites = [switch.text for switch in self.switches if switch.value]
+        if not selected_sites:
             self.main_window.error_dialog("Error", "Please select a site")
             return
 
