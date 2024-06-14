@@ -141,6 +141,23 @@ class PreferenceManager:
         prompt_df = prompt_df.map(lambda value: "" if pd.isna(value) else value)
         return prompt_df[column_name].to_list()
 
+    @staticmethod
+    def fetch_all_images(sheet_name: str, excel_file_path: str = "preferences.xlsx", column_name: str = "image"):
+        """
+        A static method to fetch all image path (images) from a specified Excel sheet.
+
+        Args:
+            sheet_name (str): The name of the sheet in the Excel file.
+            excel_file_path (str): The path to the Excel file. Default is "preferences.xlsx".
+            column_name (str): The name of the column containing the image URLs. Default is "image".
+
+        Returns:
+            list: A list of image Paths from the specified column.
+        """
+        image_df = pd.read_excel(excel_file_path, sheet_name=sheet_name)
+        image_df = image_df.map(lambda value: "" if pd.isna(value) else value)
+        return image_df[column_name].to_list()
+
 
 if __name__ == "__main__":
     preferences = PreferenceManager()
