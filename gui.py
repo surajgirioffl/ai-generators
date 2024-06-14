@@ -3,7 +3,7 @@
 GUI module to provide Graphical User Interface for the application.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 09th June 2024
-Last-modified: 11th June 2024
+Last-modified: 15th June 2024
 Error-series: 2300
 """
 
@@ -11,7 +11,7 @@ import logging
 import importlib
 import toga
 from toga.style import Pack
-from toga.style.pack import COLUMN
+from toga.style.pack import COLUMN, ROW
 
 __author__ = "Suraj Kumar Giri"
 __version__ = "0.0.0"
@@ -42,10 +42,18 @@ class AIGenerator(toga.App):
             on_change=self.on_category_change,
         )
 
-        # 3. Sites dropdown widget
-        sites_label = toga.Label(text="Select Site", style=normal_label_style)
+        # 3. Sites Checkbox widget
+        sites_label = toga.Label(text="Select Sites", style=normal_label_style)
         # 3.1 Generation Category dropdown
-        self.sites_dropdown = toga.Selection(items=[], style=dropdown_style)
+        self.sites_checkbox_container = toga.ScrollContainer(
+            horizontal=True,
+            vertical=False,
+            style=Pack(padding_left=50, padding_right=50, alignment="center", text_align="center", padding_bottom=-50),
+        )
+        self.sites_checkbox_container.content = toga.Label(
+            "Select a category first",
+            style=Pack(background_color="white", color="black", font_size=15, font_weight="bold", text_align="center", padding_top=10),
+        )
 
         # 4. Prompt dropdown widget
         prompts_label = toga.Label(text="Select Prompt", style=normal_label_style)
@@ -74,7 +82,7 @@ class AIGenerator(toga.App):
         # Adding widgets to the box
         self.box.add(box_heading)
         self.box.add(generation_category_label)
-        self.box.add(self.generation_category_dropdown, sites_label, self.sites_dropdown, prompts_label, self.prompts_dropdown)
+        self.box.add(self.generation_category_dropdown, sites_label, self.sites_checkbox_container, prompts_label, self.prompts_dropdown)
         self.box.add(self.submit_button)
 
         # Adding the box as the content of the main window
@@ -96,9 +104,32 @@ class AIGenerator(toga.App):
         selected_category = widget.value.lower().replace(" ", "_")
         sites: list | None = self.categories_sites_mapping.get(selected_category)
         if sites:
-            self.sites_dropdown.items = [site.title() for site in sites]
+            self.sites_checkbox_container.content = None  # Clearing the previous content
+            sites = [site.title() for site in sites]
+
+            switch_style = Pack(font_size=15, font_weight="bold", padding=10)
+            self.switches = []
+            switches_container = toga.Box(style=Pack(direction=ROW))
+            for site in sites:
+                switch = toga.Switch(site, style=switch_style)
+                switches_container.add(switch)
+                self.switches.append(switch)
+
+            # Adding the switches to the container
+            self.sites_checkbox_container.content = switches_container
+            if len(sites) < 5:
+                # Scrollbar will not appear in this case. So, decreasing the padding bottom to reduce the space and make it look good.
+                self.sites_checkbox_container.style.padding_bottom = -50
+            else:
+                # Scrollbar will appear in this case.
+                self.sites_checkbox_container.style.padding_bottom = 0
         else:
-            self.sites_dropdown.items = [""]
+            # No sites found for the selected category
+            self.sites_checkbox_container.content = toga.Label(
+                "No sites found for the selected category",
+                style=Pack(background_color="white", color="black", font_size=15, font_weight="bold", text_align="center", padding_top=10),
+            )
+            self.sites_checkbox_container.style.padding_bottom = -50
 
     def on_submit(self, widget):
         """
