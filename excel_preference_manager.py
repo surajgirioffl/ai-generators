@@ -124,6 +124,23 @@ class PreferenceManager:
         excel_file = pd.ExcelFile(excel_file_path)
         return excel_file.sheet_names  # list of all sheet names
 
+    @staticmethod
+    def fetch_all_prompts(sheet_name: str, excel_file_path: str = "preferences.xlsx", column_name: str = "prompt"):
+        """
+        A function to fetch all prompts from a sheet of an Excel file.
+
+        Parameters:
+            sheet_name (str): The name of the sheet in the Excel file.
+            excel_file_path (str): The path to the Excel file (default is "preferences.xlsx").
+            column_name (str): The name of the column containing prompts (default is "prompt").
+
+        Returns:
+            list: A list of prompts extracted from the specified column.
+        """
+        prompt_df = pd.read_excel(excel_file_path, sheet_name=sheet_name)
+        prompt_df = prompt_df.map(lambda value: "" if pd.isna(value) else value)
+        return prompt_df[column_name].to_list()
+
 
 if __name__ == "__main__":
     preferences = PreferenceManager()
