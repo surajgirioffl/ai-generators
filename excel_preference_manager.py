@@ -110,6 +110,20 @@ class PreferenceManager:
                 sites_options[row_col_dict["category"]] = {site_dict["site"]: site_dict}
         return sites_options
 
+    @staticmethod
+    def fetch_excel_sheet_names(excel_file_path: str = "preferences.xlsx"):
+        """
+        A static method to fetch the names of all the sheets in an Excel file.
+
+        Parameters:
+            excel_file_path (str): Path to the Excel file. Defaults to "preferences.xlsx".
+
+        Returns:
+            list: A list of sheet names in the Excel file.
+        """
+        excel_file = pd.ExcelFile(excel_file_path)
+        return excel_file.sheet_names  # list of all sheet names
+
 
 if __name__ == "__main__":
     preferences = PreferenceManager()
