@@ -41,7 +41,6 @@ def main() -> None:
     preference_manager = PreferenceManager()
     categories, categories_sites_mapping = preference_manager.fetch_categories_and_sites()
     sites_preferences: dict = preference_manager.fetch_sites_preferences()
-    prompts: list = preference_manager.fetch_prompts()
 
     driver = tools.get_webdriver_instance(profile_dir_path=f"{os.getcwd()}/appdata/profile")
     driver.maximize_window()
@@ -49,16 +48,16 @@ def main() -> None:
     if len(sys.argv) > 1:
         if sys.argv[1] in ["CLI", "cli"]:
             logging.info("CLI version specified. Starting CLI version...")
-            cli.main(categories, categories_sites_mapping, sites_preferences, prompts, driver)
+            cli.main(categories, categories_sites_mapping, sites_preferences, driver)
         elif sys.argv[1] in ["GUI", "gui"]:
             logging.info("GUI version specified. Starting GUI version...")
-            gui.main(categories, categories_sites_mapping, sites_preferences, prompts, driver)
+            gui.main(categories, categories_sites_mapping, sites_preferences, driver)
         else:
             logging.error("Invalid args. Starting default CLI version...")
-            cli.main(categories, categories_sites_mapping, sites_preferences, prompts, driver)
+            cli.main(categories, categories_sites_mapping, sites_preferences, driver)
     else:
         logging.info("No args specified. Starting default CLI version...")
-        cli.main(categories, categories_sites_mapping, sites_preferences, prompts, driver)
+        cli.main(categories, categories_sites_mapping, sites_preferences, driver)
 
 
 if __name__ == "__main__":
