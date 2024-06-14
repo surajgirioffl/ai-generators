@@ -12,6 +12,7 @@ import importlib
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
+from excel_preference_manager import PreferenceManager
 
 __author__ = "Suraj Kumar Giri"
 __version__ = "0.0.0"
@@ -55,12 +56,10 @@ class AIGenerator(toga.App):
             style=Pack(background_color="white", color="black", font_size=15, font_weight="bold", text_align="center", padding_top=10),
         )
 
-        # 4. Prompt dropdown widget
-        prompts_label = toga.Label(text="Select Prompt", style=normal_label_style)
-        # 4.1 Generation Category dropdown
-        prompts = self.prompts.copy()
-        prompts.insert(0, "")  # Inserting an empty prompt at the beginning
-        self.prompts_dropdown = toga.Selection(items=prompts, style=dropdown_style)
+        # 4. Prompt or image dropdown widget
+        self.prompts_label = toga.Label(text="Select Excel Sheet", style=normal_label_style)
+        # 4.1 Prompt/image sheet selection dropdown
+        self.prompt_image_sheet_dropdown = toga.Selection(items=[""], style=dropdown_style)
 
         # 5. Submit Button widget
         button_style = Pack(
@@ -82,7 +81,13 @@ class AIGenerator(toga.App):
         # Adding widgets to the box
         self.box.add(box_heading)
         self.box.add(generation_category_label)
-        self.box.add(self.generation_category_dropdown, sites_label, self.sites_checkbox_container, prompts_label, self.prompts_dropdown)
+        self.box.add(
+            self.generation_category_dropdown,
+            sites_label,
+            self.sites_checkbox_container,
+            self.prompts_label,
+            self.prompt_image_sheet_dropdown,
+        )
         self.box.add(self.submit_button)
 
         # Adding the box as the content of the main window
@@ -102,6 +107,8 @@ class AIGenerator(toga.App):
             None
         """
         selected_category = widget.value.lower().replace(" ", "_")
+
+        # For sites
         sites: list | None = self.categories_sites_mapping.get(selected_category)
         if sites:
             self.sites_checkbox_container.content = None  # Clearing the previous content
@@ -131,6 +138,19 @@ class AIGenerator(toga.App):
             )
             self.sites_checkbox_container.style.padding_bottom = -50
 
+        # For Prompts (or Images in case of image_to_video category)
+        if selected_category:
+            excel_sheets = PreferenceManager.fetch_excel_sheet_names()
+            if selected_category == "image_to_video":
+                self.prompts_label.text = "Select Excel Sheet For Images"
+                self.prompt_image_sheet_dropdown.items = [sheet for sheet in excel_sheets if sheet.startswith("image")]
+            else:
+                self.prompts_label.text = "Select Excel Sheet For Prompts"
+                self.prompt_image_sheet_dropdown.items = [sheet for sheet in excel_sheets if sheet.startswith("prompt")]
+        else:
+            self.prompts_label.text = "Select Excel Sheet"
+            self.prompt_image_sheet_dropdown.items = [""]
+
     def on_submit(self, widget):
         """
         A method that handles the submit event for the submit button.
@@ -152,12 +172,19 @@ class AIGenerator(toga.App):
             self.main_window.error_dialog("Error", "Please select a site")
             return
 
-        # Prompt is not compulsory
+        # Checking for selected sheets for image/prompt.
+        if not self.prompt_image_sheet_dropdown.value:
+            message = (
+                "Please select an Excel sheet for images"
+                if self.generation_category_dropdown.value == "image_to_video"
+                else "Please select an Excel sheet for prompt"
+            )
+            self.main_window.error_dialog("Error", message)
 
         # Fetching selected values
         selected_category = self.generation_category_dropdown.value.lower().replace(" ", "_")
         selected_site = self.sites_dropdown.value.lower().replace(" ", "_")
-        selected_prompt = self.prompts_dropdown.value
+        selected_prompt = self.prompt_image_sheet_dropdown.value
 
         # Started performing operations based on selected values
         self.submit_button.enabled = False  # Disabling the submit button until content is generated
@@ -208,13 +235,10 @@ class AIGenerator(toga.App):
             logging.warning("======================AI Generation Failed | STATUS -> FAILED =======================")
             self.main_window.error_dialog("Failed", "AI Generation Failed.")
 
-    def set_attributes(
-        self, categories: list, categories_sites_mapping: dict, sites_preferences: dict, prompts: list, driver=None, *args, **kwargs
-    ):
+    def set_attributes(self, categories: list, categories_sites_mapping: dict, sites_preferences: dict, driver=None, *args, **kwargs):
         self.categories: list = categories
         self.categories_sites_mapping: dict = categories_sites_mapping
         self.sites_preferences: dict = sites_preferences
-        self.prompts: list = prompts
         self.driver = driver
         self.args = args
         self.kwargs = kwargs
@@ -224,7 +248,6 @@ def main(
     categories: list,
     categories_sites_mapping: dict,
     sites_preferences: dict,
-    prompts: list,
     driver=None,
     app_name: str = "AI Generator",
     app_id: str = "org.surajgirioffl.ai_generator",
@@ -242,7 +265,6 @@ def main(
         categories (list): A list of available categories.
         categories_sites_mapping (dict): A dictionary mapping categories to sites.
         sites_preferences (dict): A dictionary containing preferences for each site.
-        prompts (list): A list of available prompts.
         driver (optional): An optional web driver object.
         app_name (str): The name of the application (application title that will visible to the user)
         app_id (str): The ID of the application. E.g: com.example.myapp
@@ -259,7 +281,7 @@ def main(
         icon = toga.Icon(icon_path)
 
     app = AIGenerator(app_name, app_id, author=__author__, version=__version__, description=__description__, icon=icon, home_page=home_page)
-    app.set_attributes(categories, categories_sites_mapping, sites_preferences, prompts, driver, *args, **kwargs)
+    app.set_attributes(categories, categories_sites_mapping, sites_preferences, driver, *args, **kwargs)
     app.main_loop()
 
 
