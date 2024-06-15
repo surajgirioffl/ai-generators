@@ -18,3 +18,9 @@ class Sites(Base):
     __tablename__ = "sites"
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     site_name = mapped_column(String, unique=True, nullable=False)
+
+
+class Prompts(Base):
+    __tablename__ = "prompts"
+    id = mapped_column(Integer, primary_key=True, autoincrement=True)
+    prompt = mapped_column(String, nullable=False)
