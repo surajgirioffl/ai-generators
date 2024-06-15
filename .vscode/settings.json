@@ -18,6 +18,8 @@
         "pixverse",
         "pyautogui",
         "pymongo",
+        "sessionmaker",
+        "sqlalchemy",
         "sqldf",
         "surajgirioffl",
         "testid",
