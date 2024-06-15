@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 20th May 2024
-Last-modified: 10th June 2024
+Last-modified: 16th June 2024
 Error-series: 1600
 """
 
@@ -65,13 +65,16 @@ class Ideogram:
             logging.info("Login success.")
             return True
 
-    def download_images(self, links: list[str], path: str, filenames: list[str] = None):
+    def download_images(self, links: list[str], path: str, filenames: list[str] = None) -> list[str]:
         """Download images from a list of links to the specified path with optional custom filenames.
 
         Parameters:
             links (list[str]): A list of URLs pointing to the images to be downloaded.
             path (str): The local directory path where the images will be saved.
             filenames (list[str], optional): A list of custom filenames corresponding to the downloaded images. Defaults to None.
+
+        Returns:
+            list[str]: A list of absolute paths to the downloaded images.
         """
         logging.info("Downloading started...")
         headers = {
@@ -103,6 +106,8 @@ class Ideogram:
 
             headers["path"] = link.lstrip("https://ideogram.ai")  # This is one of the header
 
+            created_filenames: list = []
+
             while True:
                 with requests.Session() as session:
                     session.headers.update(headers)
@@ -110,11 +115,13 @@ class Ideogram:
                     if response.headers.get("Content-Type") == "image/jpeg":
                         with open(os.path.join(path, filename), "wb") as file:
                             file.write(response.content)
+                            created_filenames.append(file.name)
                             break
                     else:
                         # In case of error, retry. Means that the response content is not an image.
                         logging.error("Response content is not an image. Retrying...")
         logging.info("Download completed.")
+        return created_filenames
 
     def fetch_images_link(self, prompt: str) -> list:
         """A function to fetch generated image links.

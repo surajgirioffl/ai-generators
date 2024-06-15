@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 27th May 2024
-Last-modified: 11th June 2024
+Last-modified: 16th June 2024
 Error-series: 1200
 """
 
@@ -219,7 +219,17 @@ class Pixlr:
         logging.info("Images links fetched successfully...")
         return [image.get_attribute("src") for image in images]
 
-    def download_images(self, links: list[str], path: str, filename: str | None = None):
+    def download_images(self, links: list[str], path: str, filename: str | None = None) -> list[str]:
+        """Download images from a list of links to the specified path with optional custom filenames.
+
+        Parameters:
+            links (list[str]): A list of URLs pointing to the images to be downloaded.
+            path (str): The local directory path where the images will be saved.
+            filenames (list[str], optional): A list of custom filenames corresponding to the downloaded images. Defaults to None.
+
+        Returns:
+            list[str]: A list of absolute paths to the downloaded images.
+        """
         logging.info("Downloading images...")
         original_filename = filename  # Saving the filename in another variable. So, it will not lost.
 
@@ -227,6 +237,8 @@ class Pixlr:
         # Link is like: 'data:image/png;base64,....base64_text.......'
         decoded_images_data: list[bytes] = [base64.b64decode(link.split(",")[1]) for link in links]
         logging.info("Image data decoded successfully....")
+
+        created_filenames: list = []
 
         for index, image_data in enumerate(decoded_images_data):
             if original_filename:
@@ -236,4 +248,7 @@ class Pixlr:
 
             with open(os.path.join(path, filename), "wb") as file:
                 file.write(image_data)
+                created_filenames.append(file.name)
+
         logging.info("Images downloaded successfully...")
+        return created_filenames
