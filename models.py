@@ -7,7 +7,7 @@ Error-series: 2400
 """
 
 from sqlalchemy import Integer, String, ForeignKey, create_engine
-from sqlalchemy.orm import DeclarativeBase, mapped_column
+from sqlalchemy.orm import DeclarativeBase, mapped_column, sessionmaker
 
 
 class Base(DeclarativeBase):
@@ -38,4 +38,9 @@ engine = create_engine("sqlite:///ai_generator.db", echo=False)
 Base.metadata.create_all(bind=engine)
 
 if __name__ == "__main__":
-    pass
+    sites = ["pixverse", "haiper", "ideogram", "wordhero", "pixlr"]
+    site_objects = [Sites(site_name=site) for site in sites]
+    Session = sessionmaker(bind=engine)
+    with Session() as session:
+        session.add_all(site_objects)
+        session.commit()
