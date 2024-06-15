@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 09th June 2024
-Last-modified: 10th June 2024
+Last-modified: 16th June 2024
 Error-series: 3100
 """
 
@@ -42,8 +42,9 @@ def main() -> None:
     categories, categories_sites_mapping = preference_manager.fetch_categories_and_sites()
     sites_preferences: dict = preference_manager.fetch_sites_preferences()
 
-    driver = tools.get_webdriver_instance(profile_dir_path=f"{os.getcwd()}/appdata/profile")
-    driver.maximize_window()
+    # driver = tools.get_webdriver_instance(profile_dir_path=f"{os.getcwd()}/appdata/profile")
+    # driver.maximize_window()
+    driver = None
 
     if len(sys.argv) > 1:
         if sys.argv[1] in ["CLI", "cli"]:
