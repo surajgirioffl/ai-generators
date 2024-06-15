@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 23rd May 2024
-Last-modified: 10th June 2024
+Last-modified: 16th June 2024
 Error-series: 1100
 """
 
@@ -50,7 +50,8 @@ def main(site_preferences: dict, driver=None, *args, **kwargs):
     """
     local_webdriver = False
     if not driver:
-        driver = tools.get_webdriver_instance(profile_dir_path=f"{os.getcwd()}/appdata/profile")
+        # driver = tools.get_webdriver_instance(profile_dir_path=f"{os.getcwd()}/appdata/profile")
+        driver = tools.get_webdriver_instance()
         driver.maximize_window()
         local_webdriver = True
 
