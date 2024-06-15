@@ -24,3 +24,18 @@ class Prompts(Base):
     __tablename__ = "prompts"
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     prompt = mapped_column(String, nullable=False)
+
+
+class Output(Base):
+    __tablename__ = "output"
+    file_path = mapped_column(String, primary_key=True, nullable=False)
+    category = mapped_column(String, nullable=False)
+    site_id = mapped_column(Integer, ForeignKey(Sites.id), nullable=False)
+    prompt_id = mapped_column(Integer, ForeignKey(Prompts.id), nullable=False)
+
+
+engine = create_engine("sqlite:///ai_generator.db", echo=False)
+Base.metadata.create_all(bind=engine)
+
+if __name__ == "__main__":
+    pass
