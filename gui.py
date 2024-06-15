@@ -3,7 +3,7 @@
 GUI module to provide Graphical User Interface for the application.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 09th June 2024
-Last-modified: 15th June 2024
+Last-modified: 16th June 2024
 Error-series: 2300
 """
 
@@ -167,7 +167,7 @@ class AIGenerator(toga.App):
             return
 
         # Checking for the selected sites.
-        selected_sites = [switch.text for switch in self.switches if switch.value]
+        selected_sites = [switch.text.lower() for switch in self.switches if switch.value]
         if not selected_sites:
             self.main_window.error_dialog("Error", "Please select a site")
             return
@@ -183,18 +183,18 @@ class AIGenerator(toga.App):
 
         # Fetching selected values
         selected_category = self.generation_category_dropdown.value.lower().replace(" ", "_")
-        selected_site = self.sites_dropdown.value.lower().replace(" ", "_")
-        selected_prompt = self.prompt_image_sheet_dropdown.value
+        selected_sites = selected_sites  # Just for readability
+        selected_sheet = self.prompt_image_sheet_dropdown.value
 
         # Started performing operations based on selected values
         self.submit_button.enabled = False  # Disabling the submit button until content is generated
 
         # Performing AI generation
-        self.perform_ai_generation_operation(selected_category, selected_site, selected_prompt)
+        self.perform_ai_generation_operation(selected_category, selected_sites, selected_sheet)
 
         self.submit_button.enabled = True  # Enabling the submit button after content is generated
 
-    def perform_ai_generation_operation(self, selected_category: str, selected_site: str, selected_prompt: str):
+    def perform_ai_generation_operation(self, selected_category: str, selected_sites: str | list, selected_sheet: str):
         """
         A function to perform an AI generation operation with the given parameters.
 
@@ -207,10 +207,15 @@ class AIGenerator(toga.App):
         Returns:
             None
         """
-        # Updating prompt for the selected site
-        if "prompt" in self.sites_preferences[selected_category][selected_site]["options"].keys():
-            # BTW Above condition is not required. If prompt key doesn't exist then 'prompt' key will created and accepted by **kwargs of the function which accept this site options as args.
-            self.sites_preferences[selected_category][selected_site]["options"]["prompt"] = selected_prompt
+        # Updating prompts/images for the selected site
+        for selected_site in selected_sites:
+            if "prompt" in self.sites_preferences[selected_category][selected_site]["options"].keys():
+                # BTW Above condition is not required. If prompt key doesn't exist then 'prompt' key will created and accepted by **kwargs of the function which accept this site options as args.
+                prompts: list = PreferenceManager.fetch_all_prompts(selected_sheet)
+                self.sites_preferences[selected_category][selected_site]["options"]["prompt"] = prompts
+            elif "image" in self.sites_preferences[selected_category][selected_site]["options"].keys():
+                images: list = PreferenceManager.fetch_all_prompts(selected_sheet)
+                self.sites_preferences[selected_category][selected_site]["options"]["image"] = images
 
         category_package_name_mapping: dict[str, str] = {
             "text_to_video": "ai_video_generators",
@@ -219,21 +224,22 @@ class AIGenerator(toga.App):
             "text_to_text": "ai_content_generators",
         }
 
-        logging.info("======================Starting a new AI Generation (With GUI Interface)=======================")
-        logging.info(f"Category: {selected_category} | Site: {selected_site} | Prompt: {selected_prompt}")
+        for selected_site in selected_sites:
+            logging.info("======================Starting a new AI Generation (With GUI Interface)=======================")
+            logging.info(f"Category: {selected_category} | Site: {selected_site} | Sheet: {selected_sheet}")
 
-        module = f"{category_package_name_mapping[selected_category]}.{selected_site}_ai.main"
-        module = importlib.import_module(module)
-        status: bool = module.main(
-            site_preferences=self.sites_preferences[selected_category][selected_site], driver=self.driver, *self.args, **self.kwargs
-        )
+            module = f"{category_package_name_mapping[selected_category]}.{selected_site}_ai.main"
+            module = importlib.import_module(module)
+            status: bool = module.main(
+                site_preferences=self.sites_preferences[selected_category][selected_site], driver=self.driver, *self.args, **self.kwargs
+            )
 
-        if status:
-            logging.info("======================AI Generation Completed | STATUS -> SUCCESS =======================")
-            self.main_window.info_dialog("Success", "AI Generation Completed Successfully")
-        else:
-            logging.warning("======================AI Generation Failed | STATUS -> FAILED =======================")
-            self.main_window.error_dialog("Failed", "AI Generation Failed.")
+            if status:
+                logging.info("======================AI Generation Completed | STATUS -> SUCCESS =======================")
+                self.main_window.info_dialog("Success", "AI Generation Completed Successfully")
+            else:
+                logging.warning("======================AI Generation Failed | STATUS -> FAILED =======================")
+                self.main_window.error_dialog("Failed", "AI Generation Failed.")
 
     def set_attributes(self, categories: list, categories_sites_mapping: dict, sites_preferences: dict, driver=None, *args, **kwargs):
         self.categories: list = categories
