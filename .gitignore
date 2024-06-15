@@ -165,3 +165,4 @@ dev/
 temp/
 appdata/
 profile/
+*.db
