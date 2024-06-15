@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 9th May 2024
-Last-modified: 11th June 2024
+Last-modified: 16th June 2024
 Error-series: 1200
 """
 
@@ -37,19 +37,24 @@ def login_with_google(driver: Chrome | Edge | Any) -> None:
     wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, login_with_google_selector))).click()
 
 
-def download_video(link: str, path: str, filename: str = None):
+def download_video(link: str, path: str, filename: str = None) -> str:
     """Download a video from the given link and save it to the specified path with an optional filename.
 
     Args:
         link (str): The URL of the video to download.
         path (str): The directory path where the video will be saved.
         filename (str, optional): The name of the file to save the video as. If not provided, a default filename will be generated.
+
+    Returns:
+        str: The absolute path of the saved file.
     """
     if not filename:
         filename = datetime.now().strftime("pixverse_%Y%m%d%H%M%S.mp4")
     response = requests.get(link)
     with open(os.path.join(path, filename), "wb") as file:
         file.write(response.content)
+        created_filename = file.name
+    return os.path.abspath(created_filename)
 
 
 def fetch_generated_video_link(driver: Chrome | Edge | Any) -> str | bool:
