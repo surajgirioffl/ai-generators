@@ -59,15 +59,19 @@ class AIGeneratorDB:
         self.session.commit()
         return row.id
 
-    def insert_output(self, file_path: str, category: str, site_id: str, prompt_id: str = None, image_id: str = None):
+    def insert_output(self, file_path: str | list, category: str, site_id: str, prompt_id: str = None, image_id: str = None):
         """Insert the output into the database.
 
         Parameters:
-            file_path (str): The path to the output file.
+            file_path (str | list): The path to the output file or list of path to output files (if more than one output files).
             category (str): The category of the site.
             site_id (str): The ID of the site.
             prompt_id (str, optional): The ID of the prompt (default is None).
             image_id (str, optional): The ID of the image (default is None).
         """
-        self.session.add(Output(file_path=file_path, category=category, site_id=site_id, prompt_id=prompt_id, image_id=image_id))
+        if isinstance(file_path, str):
+            self.session.add(Output(file_path=file_path, category=category, site_id=site_id, prompt_id=prompt_id, image_id=image_id))
+        else:
+            for path in file_path:
+                self.session.add(Output(file_path=path, category=category, site_id=site_id, prompt_id=prompt_id, image_id=image_id))
         self.session.commit()
