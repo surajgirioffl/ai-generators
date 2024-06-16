@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 09th June 2024
-Last-modified: 16th June 2024
+Last-modified: 17th June 2024
 Error-series: 3100
 """
 
@@ -57,8 +57,8 @@ def main() -> None:
             logging.error("Invalid args. Starting default CLI version...")
             cli.main(categories, categories_sites_mapping, sites_preferences, driver)
     else:
-        logging.info("No args specified. Starting default CLI version...")
-        cli.main(categories, categories_sites_mapping, sites_preferences, driver)
+        logging.info("No args specified. Starting default GUI version...")
+        gui.main(categories, categories_sites_mapping, sites_preferences, driver)
 
 
 if __name__ == "__main__":
