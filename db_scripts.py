@@ -72,6 +72,8 @@ class AIGeneratorDB:
         if isinstance(file_path, str):
             self.session.add(Output(file_path=file_path, category=category, site_id=site_id, prompt_id=prompt_id, image_id=image_id))
         else:
-            for path in file_path:
-                self.session.add(Output(file_path=path, category=category, site_id=site_id, prompt_id=prompt_id, image_id=image_id))
+            rows = [
+                Output(file_path=path, category=category, site_id=site_id, prompt_id=prompt_id, image_id=image_id) for path in file_path
+            ]
+            self.session.add_all(rows)
         self.session.commit()
