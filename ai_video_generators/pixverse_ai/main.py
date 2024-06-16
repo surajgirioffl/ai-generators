@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 7th May 2024
-Last-modified: 16th June 2024
+Last-modified: 17th June 2024
 Error-series: 1100
 """
 
@@ -27,6 +27,7 @@ from selenium.common.exceptions import TimeoutException
 if __name__ == "__main__":
     import pixverse
 else:
+    from db_scripts import AIGeneratorDB
     from . import pixverse
 
 PROJECT_DIR = os.path.dirname(__file__)
@@ -250,13 +251,25 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
         images: list = images if isinstance(images, list) else [images]
         logging.info(f"Total number of images path in this batch is {len(images)}")
 
+        db = AIGeneratorDB()
+
         for index, image in enumerate(images):
             site_preferences["options"]["image"] = image
             logging.info(f"Initiating video generation for the image index {index}...")
             pixverse.create_video_from_images(driver, **site_preferences["options"])
             link = pixverse.fetch_generated_video_link(driver)
-            pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
+            downloaded_video_path = pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
             logging.info(f"Operation Completed for the image index {index}")
+
+            # Saving the required entities into the database
+            db.insert_output(
+                file_path=downloaded_video_path,
+                category=site_preferences["category"],
+                site_id=db.get_site_id(site_preferences["site"]),
+                image_id=db.insert_image(image),
+            )
+            logging.info("Output details successfully inserted into the database...")
+
     else:
         logging.info("Initiating video generation from prompt...")
 
@@ -264,13 +277,24 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
         prompts: list = prompts if isinstance(prompts, list) else [prompts]
         logging.info(f"Total number of prompts in this batch is {len(prompts)}")
 
+        db = AIGeneratorDB()
+
         for index, prompt in enumerate(prompts):
             site_preferences["options"]["prompt"] = prompt
             logging.info(f"Initiating image generation for the prompt index {index}...")
             pixverse.create_video_from_prompt(driver, **site_preferences["options"])
             link = pixverse.fetch_generated_video_link(driver)
-            pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
+            downloaded_video_path = pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
             logging.info(f"Operation Completed for the prompt index {index}")
+
+            # Saving the required entities into the database
+            db.insert_output(
+                file_path=downloaded_video_path,
+                category=site_preferences["category"],
+                site_id=db.get_site_id(site_preferences["site"]),
+                prompt_id=db.insert_prompt(prompt),
+            )
+            logging.info("Output details successfully inserted into the database...")
 
     print("Operation Completed (Pixverse)")
     logging.info("Operation Completed (Pixverse)")
