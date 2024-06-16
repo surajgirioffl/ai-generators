@@ -3,7 +3,7 @@
 GUI module to provide Graphical User Interface for the application.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 09th June 2024
-Last-modified: 16th June 2024
+Last-modified: 17th June 2024
 Error-series: 2300
 """
 
@@ -230,16 +230,20 @@ class AIGenerator(toga.App):
 
             module = f"{category_package_name_mapping[selected_category]}.{selected_site}_ai.main"
             module = importlib.import_module(module)
-            status: bool = module.main(
-                site_preferences=self.sites_preferences[selected_category][selected_site], driver=self.driver, *self.args, **self.kwargs
-            )
+            try:
+                status: bool = module.main(
+                    site_preferences=self.sites_preferences[selected_category][selected_site], driver=self.driver, *self.args, **self.kwargs
+                )
+            except Exception as e:
+                logging.exception(f"Exception: {e}. Error Code: 2301")
+                self.main_window.error_dialog("Exception", str(e))
 
             if status:
                 logging.info("======================AI Generation Completed | STATUS -> SUCCESS =======================")
-                self.main_window.info_dialog("Success", "AI Generation Completed Successfully")
+                self.main_window.info_dialog("Success", f"AI Generation Completed Successfully For {selected_site}")
             else:
                 logging.warning("======================AI Generation Failed | STATUS -> FAILED =======================")
-                self.main_window.error_dialog("Failed", "AI Generation Failed.")
+                self.main_window.error_dialog("Failed", f"AI Generation Failed For {selected_site}")
 
     def set_attributes(self, categories: list, categories_sites_mapping: dict, sites_preferences: dict, driver=None, *args, **kwargs):
         self.categories: list = categories
