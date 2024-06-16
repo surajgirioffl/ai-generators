@@ -26,6 +26,12 @@ class Prompts(Base):
     prompt = mapped_column(String, nullable=False)
 
 
+class Images(Base):
+    __tablename__ = "images"
+    id = mapped_column(Integer, primary_key=True, autoincrement=True)
+    image = mapped_column(String, nullable=False)
+
+
 class Output(Base):
     __tablename__ = "output"
     file_path = mapped_column(String, primary_key=True, nullable=False)
