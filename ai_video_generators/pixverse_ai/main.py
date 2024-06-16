@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 7th May 2024
-Last-modified: 11th June 2024
+Last-modified: 16th June 2024
 Error-series: 1100
 """
 
@@ -244,18 +244,33 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
         return False
 
     if is_image_option_available(site_preferences):
-        logging.info("Initiating video generation from images...")
-        if not site_preferences["options"].get("image"):
-            image = CONFIG["Default_location_start"]["default_image_location"]
+        logging.info("Initiating video generation from images (Pixverse AI)...")
+
+        images: list | str = site_preferences["options"]["image"]
+        images: list = images if isinstance(images, list) else [images]
+        logging.info(f"Total number of images path in this batch is {len(images)}")
+
+        for index, image in enumerate(images):
             site_preferences["options"]["image"] = image
-        pixverse.create_video_from_images(driver, **site_preferences["options"])
-        link = pixverse.fetch_generated_video_link(driver)
-        pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
+            logging.info(f"Initiating video generation for the image index {index}...")
+            pixverse.create_video_from_images(driver, **site_preferences["options"])
+            link = pixverse.fetch_generated_video_link(driver)
+            pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
+            logging.info(f"Operation Completed for the image index {index}")
     else:
         logging.info("Initiating video generation from prompt...")
-        pixverse.create_video_from_prompt(driver, **site_preferences["options"])
-        link = pixverse.fetch_generated_video_link(driver)
-        pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
+
+        prompts: list | str = site_preferences["options"]["prompt"]
+        prompts: list = prompts if isinstance(prompts, list) else [prompts]
+        logging.info(f"Total number of prompts in this batch is {len(prompts)}")
+
+        for index, prompt in enumerate(prompts):
+            site_preferences["options"]["prompt"] = prompt
+            logging.info(f"Initiating image generation for the prompt index {index}...")
+            pixverse.create_video_from_prompt(driver, **site_preferences["options"])
+            link = pixverse.fetch_generated_video_link(driver)
+            pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
+            logging.info(f"Operation Completed for the prompt index {index}")
 
     print("Operation Completed (Pixverse)")
     logging.info("Operation Completed (Pixverse)")
