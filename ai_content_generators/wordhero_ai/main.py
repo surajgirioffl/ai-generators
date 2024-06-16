@@ -59,11 +59,17 @@ def main(site_preferences: dict, driver=None, *args, **kwargs):
     if site_preferences.get("login_required"):
         wordhero.login_to_wordhero(SETTINGS["wordhero_credentials"]["email"], SETTINGS["wordhero_credentials"]["password"])
 
-    logging.info("Going to generate article...")
-    generated_article, prompt_response_mapping = wordhero.generate_article(**site_preferences["options"])
-    logging.info("Article generated successfully...")
-    WordHero.save_content(generated_article, SETTINGS["output_location"])
-    logging.info("Article saved successfully...")
+    prompts: list | str = site_preferences["options"]["prompt"]  # In case of wordhero, prompts are headline only
+    prompts: list = prompts if isinstance(prompts, list) else [prompts]
+    logging.info(f"Total number of headlines in this batch is {len(prompts)}")
+
+    for index, headline in enumerate(prompts):
+        site_preferences["options"]["headline"] = headline
+        logging.info(f"Going to generate article {index} of the batch...")
+        generated_article, prompt_response_mapping = wordhero.generate_article(**site_preferences["options"])
+        logging.info("Article generated successfully...")
+        WordHero.save_content(generated_article, SETTINGS["output_location"])
+        logging.info(f"Article {index} of the batch saved successfully...")
 
     # Quitting the driver instance if local_webdriver
     if local_webdriver:
