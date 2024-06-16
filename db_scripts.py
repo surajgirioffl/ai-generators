@@ -34,12 +34,22 @@ class AIGeneratorDB:
     def insert_prompt(self, prompt: str) -> int:
         """Insert a prompt into the database.
 
+        Insert the provided prompt into the database if it doesn't already exist and return the ID of the inserted prompt.
+        If the prompt already exists, return the ID of the existing prompt without performing any insertion.
+
         Args:
             prompt (str): The prompt to be inserted into the database.
 
         Returns:
             int: The ID of the inserted prompt.
         """
+        # Check if the prompt already exists
+        id = self.session.query(Prompts.id).where(Prompts.prompt == prompt).one_or_none()
+        if id:
+            # Prompt already exists
+            return id[0]
+
+        # Prompt doesn't exist, insert it
         row = Prompts(prompt=prompt)
         self.session.add(row)
         self.session.commit()
@@ -48,12 +58,22 @@ class AIGeneratorDB:
     def insert_image(self, image: str) -> int:
         """Insert an image (image_path) into the database.
 
+        Insert the provided image_path into the database if it doesn't already exist and return the ID of the inserted image_path.
+        If the image_path already exists, return the ID of the existing image_path without performing any insertion.
+
         Args:
             image (str): The image path to be inserted into the database.
 
         Returns:
             int: The ID of the inserted image (image_path).
         """
+        # Check if the image path already exists
+        id = self.session.query(Images.id).where(Images.image == image).one_or_none()
+        if id:
+            # Image path already exists
+            return id[0]
+
+        # Image path doesn't exist, insert it
         row = Images(image=image)
         self.session.add(row)
         self.session.commit()
