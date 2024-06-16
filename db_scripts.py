@@ -40,9 +40,10 @@ class AIGeneratorDB:
         Returns:
             int: The ID of the inserted prompt.
         """
-        self.session.add(Prompts(prompt=prompt))
+        row = Prompts(prompt=prompt)
+        self.session.add(row)
         self.session.commit()
-        return self.session.query(Prompts.id).where(Prompts.prompt == prompt).all()[0][0]
+        return row.id
 
     def insert_image(self, image: str) -> int:
         """Insert an image (image_path) into the database.
@@ -53,9 +54,10 @@ class AIGeneratorDB:
         Returns:
             int: The ID of the inserted image (image_path).
         """
-        self.session.add(Images(image=image))
+        row = Images(image=image)
+        self.session.add(row)
         self.session.commit()
-        return self.session.query(Images.id).where(Images.image == image).all()[0][0]
+        return row.id
 
     def insert_output(self, file_path: str, category: str, site_id: str, prompt_id: str = None, image_id: str = None):
         """Insert the output into the database.
@@ -69,8 +71,3 @@ class AIGeneratorDB:
         """
         self.session.add(Output(file_path=file_path, category=category, site_id=site_id, prompt_id=prompt_id, image_id=image_id))
         self.session.commit()
-
-
-if __name__ == "__main__":
-    db = AIGeneratorDB()
-    print(db.insert_prompt("suraj"))
