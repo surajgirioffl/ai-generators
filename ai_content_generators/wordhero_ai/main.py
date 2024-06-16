@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 23rd May 2024
-Last-modified: 16th June 2024
+Last-modified: 17th June 2024
 Error-series: 1100
 """
 
@@ -21,6 +21,7 @@ else:
     # Relative import (for executing from the root project directory)
     from . import tools
     from .wordhero import WordHero
+    from db_scripts import AIGeneratorDB
 
 
 PROJECT_DIR = os.path.dirname(__file__)
@@ -63,13 +64,24 @@ def main(site_preferences: dict, driver=None, *args, **kwargs):
     prompts: list = prompts if isinstance(prompts, list) else [prompts]
     logging.info(f"Total number of headlines in this batch is {len(prompts)}")
 
+    db = AIGeneratorDB()
+
     for index, headline in enumerate(prompts):
         site_preferences["options"]["headline"] = headline
         logging.info(f"Going to generate article {index} of the batch...")
         generated_article, prompt_response_mapping = wordhero.generate_article(**site_preferences["options"])
         logging.info("Article generated successfully...")
-        WordHero.save_content(generated_article, SETTINGS["output_location"])
+        output_filepath = WordHero.save_content(generated_article, SETTINGS["output_location"])
         logging.info(f"Article {index} of the batch saved successfully...")
+
+        # Saving the required entities into the database
+        db.insert_output(
+            file_path=output_filepath,
+            category=site_preferences["category"],
+            site_id=db.get_site_id(site_preferences["site"]),
+            prompt_id=db.insert_prompt(headline),
+        )
+        logging.info("Output details successfully inserted into the database...")
 
     # Quitting the driver instance if local_webdriver
     if local_webdriver:
