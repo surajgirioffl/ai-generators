@@ -23,13 +23,13 @@ class Sites(Base):
 class Prompts(Base):
     __tablename__ = "prompts"
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
-    prompt = mapped_column(String, nullable=False)
+    prompt = mapped_column(String, nullable=False, unique=True)
 
 
 class Images(Base):
     __tablename__ = "images"
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
-    image = mapped_column(String, nullable=False)
+    image = mapped_column(String, nullable=False, unique=True)
 
 
 class Output(Base):
