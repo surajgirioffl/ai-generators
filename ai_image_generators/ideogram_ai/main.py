@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 20th May 2024
-Last-modified: 10 June 2024
+Last-modified: 16th June 2024
 Error-series: 1500
 """
 
@@ -229,15 +229,22 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
     if site_preferences.get("login_required"):
         ideogram.login_with_google()
 
-    logging.info("Initiating image generation from prompt...")
+    prompts: list | str = site_preferences["options"]["prompt"]
+    prompts: list = prompts if isinstance(prompts, list) else [prompts]
+    logging.info(f"Total number of prompts in this batch is {len(prompts)}")
 
-    ideogram.create_image_with_prompt(**site_preferences["options"])
-    ideogram.download_images(
-        ideogram.fetch_images_link(site_preferences["options"]["prompt"]),
-        CONFIG["Default_location_start"]["default_output_location_local"],
-    )
+    for index, prompt in enumerate(prompts):
+        site_preferences["options"]["prompt"] = prompt
+        logging.info(f"Initiating image generation for the prompt {index}...")
 
-    logging.info("Operation Completed @Ideogram")
+        ideogram.create_image_with_prompt(**site_preferences["options"])
+        ideogram.download_images(
+            ideogram.fetch_images_link(site_preferences["options"]["prompt"]),
+            CONFIG["Default_location_start"]["default_output_location_local"],
+        )
+
+        logging.info(f"Operation Completed @Ideogram for the prompt {index}")
+
     if local_webdriver:
         driver.quit()  # Closing the browser
     return True
