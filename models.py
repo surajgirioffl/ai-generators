@@ -37,7 +37,8 @@ class Output(Base):
     file_path = mapped_column(String, primary_key=True, nullable=False)
     category = mapped_column(String, nullable=False)
     site_id = mapped_column(Integer, ForeignKey(Sites.id), nullable=False)
-    prompt_id = mapped_column(Integer, ForeignKey(Prompts.id), nullable=False)
+    prompt_id = mapped_column(Integer, ForeignKey(Prompts.id), nullable=True)
+    image_id = mapped_column(Integer, ForeignKey(Images.id), nullable=True)
 
 
 engine = create_engine("sqlite:///ai_generator.db", echo=False)
