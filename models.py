@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 16th June 2024
-Last-modified: 16th June 2024
+Last-modified: 17th June 2024
 Error-series: 2400
 """
 
@@ -17,7 +17,7 @@ class Base(DeclarativeBase):
 class Sites(Base):
     __tablename__ = "sites"
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
-    site_name = mapped_column(String, unique=True, nullable=False)
+    site = mapped_column(String, unique=True, nullable=False)
 
 
 class Prompts(Base):
@@ -51,7 +51,7 @@ def get_new_session() -> Session:
 
 if __name__ == "__main__":
     sites = ["pixverse", "haiper", "ideogram", "wordhero", "pixlr"]
-    site_objects = [Sites(site_name=site) for site in sites]
+    site_objects = [Sites(site=site) for site in sites]
     SessionClass = sessionmaker(bind=engine)
     with SessionClass() as session:
         session.add_all(site_objects)
