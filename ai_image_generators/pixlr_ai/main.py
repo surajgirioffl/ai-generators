@@ -44,6 +44,7 @@ def main(site_preferences: dict, driver=None, *args, **kwargs):
     Returns:
         None
     """
+    logging.info("Starting Pixlr AI...")
     local_webdriver = False
     if not driver:
         driver = tools.get_webdriver_instance()
@@ -55,9 +56,16 @@ def main(site_preferences: dict, driver=None, *args, **kwargs):
     if site_preferences.get("login_required"):
         pixlr.login(SETTINGS["pixlr_credentials"]["email"], SETTINGS["pixlr_credentials"]["password"])
 
-    pixlr.generate_image(**site_preferences["options"])
-    pixlr.download_images(pixlr.fetch_images_link(), "output")
-    logging.info("Done.... (Message by Pixlr)")
+    prompts: list | str = site_preferences["options"]["prompt"]
+    prompts: list = prompts if isinstance(prompts, list) else [prompts]
+    logging.info(f"Total number of prompts in this batch is {len(prompts)}")
+
+    for index, prompt in enumerate(prompts):
+        site_preferences["options"]["prompt"] = prompt
+        logging.info(f"Initiating image generation for the prompt index {index}...")
+        pixlr.generate_image(**site_preferences["options"])
+        pixlr.download_images(pixlr.fetch_images_link(), "output")
+        logging.info(f"Done for the prompt index {index} (Message by Pixlr)")
 
     if local_webdriver:
         driver.quit()
