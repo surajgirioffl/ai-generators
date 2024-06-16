@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 29th May 2024
-Last-modified: 16th June 2024
+Last-modified: 17th June 2024
 Error-series: 1400
 """
 
@@ -19,6 +19,7 @@ import logging
 if __name__ == "__main__":
     from pixlr import Pixlr
 else:
+    from db_scripts import AIGeneratorDB
     from .pixlr import Pixlr
 
 
@@ -60,12 +61,23 @@ def main(site_preferences: dict, driver=None, *args, **kwargs):
     prompts: list = prompts if isinstance(prompts, list) else [prompts]
     logging.info(f"Total number of prompts in this batch is {len(prompts)}")
 
+    db = AIGeneratorDB()
+
     for index, prompt in enumerate(prompts):
         site_preferences["options"]["prompt"] = prompt
         logging.info(f"Initiating image generation for the prompt index {index}...")
         pixlr.generate_image(**site_preferences["options"])
-        pixlr.download_images(pixlr.fetch_images_link(), "output")
+        downloaded_images_path = pixlr.download_images(pixlr.fetch_images_link(), "output")
         logging.info(f"Done for the prompt index {index} (Message by Pixlr)")
+
+        # Saving the required entities into the database
+        db.insert_output(
+            file_path=downloaded_images_path,
+            category=site_preferences["category"],
+            site_id=db.get_site_id(site_preferences["site"]),
+            prompt_id=db.insert_prompt(prompt),
+        )
+        logging.info("Output details successfully inserted into the database...")
 
     if local_webdriver:
         driver.quit()
