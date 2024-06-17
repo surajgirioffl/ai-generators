@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 27th May 2024
-Last-modified: 16th June 2024
+Last-modified: 17th June 2024
 Error-series: 1200
 """
 
@@ -17,6 +17,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import TimeoutException
 
 
 class Pixlr:
@@ -47,6 +48,15 @@ class Pixlr:
         """
         logging.info("Logging to Pixlr using email and password...")
         self.driver.get(Pixlr.URL)
+
+        # Removing an announcement popup (Recently added on the site - Found on 17th June) (Coded on 17th June 2017)
+        try:
+            popup = WebDriverWait(self.driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//div[starts-with(@id, "announce")]')))
+        except TimeoutException:
+            logging.info("Pop up element not found in 3 sec. Proceeding further...")
+        else:
+            logging.info("Removing an announcement popup...")
+            popup.click()
 
         # Click on login button
         self.wait.until(EC.visibility_of_element_located((By.ID, "head-login"))).click()
