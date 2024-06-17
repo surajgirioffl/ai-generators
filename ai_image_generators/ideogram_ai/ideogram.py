@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 20th May 2024
-Last-modified: 16th June 2024
+Last-modified: 17th June 2024
 Error-series: 1600
 """
 
@@ -215,9 +215,14 @@ class Ideogram:
             # Solution is clientWidth, clientHeight, clientTop, clientLeft. element.<any_of_this_property> return value greater than 0 if element visible on the screen and have some size.
             # The clientWidth property returns the viewable width of an element in pixels, including padding, but not the border, scrollbar or margin. (Similar in case of other properties from the above line)
             generate_buttons = self.driver.find_elements(By.XPATH, '//button[text()="Generate"]')
-            print(f"size: {generate_buttons[1].size}")  # size: {'height': 23, 'width': 75}
-            print(generate_buttons[1].get_dom_attribute("clientWidth"))  # None (For DOM attributes only)
-            print(generate_buttons[1].get_property("clientWidth"))  # 75
+            logging.info(f"Number of Generate buttons: {len(generate_buttons)}")
+            if len(generate_buttons) > 1:
+                logging.info(f"Button-1 size: {generate_buttons[0].size}")
+                logging.info(f"Button-2 size: {generate_buttons[1].size}")  # size: {'height': 23, 'width': 75}
+            else:
+                logging.info(f"Button-1 size: {generate_buttons[1].size}")
+            # logging.info(generate_buttons[1].get_dom_attribute("clientWidth"))  # None (For DOM attributes only)
+            # logging.info(generate_buttons[1].get_property("clientWidth"))  # 75
             for generate_button in generate_buttons:
                 if int(generate_button.get_property("clientWidth")) > 0:
                     generate_button.click()
