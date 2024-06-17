@@ -98,6 +98,8 @@ class Ideogram:
             "Upgrade-Insecure-Requests": "1",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
         }
+        created_filenames: list = []
+
         for index, link in enumerate(links):
             if not filenames:
                 filename = datetime.now().strftime(f"ideogram_%Y%m%d%H%M%S_{index}.jpg")
@@ -106,8 +108,6 @@ class Ideogram:
 
             headers["path"] = link.lstrip("https://ideogram.ai")  # This is one of the header
 
-            created_filenames: list = []
-
             while True:
                 with requests.Session() as session:
                     session.headers.update(headers)
@@ -115,7 +115,7 @@ class Ideogram:
                     if response.headers.get("Content-Type") == "image/jpeg":
                         with open(os.path.join(path, filename), "wb") as file:
                             file.write(response.content)
-                            created_filenames.append(file.name)
+                            created_filenames.append(os.path.abspath(file.name))
                             break
                     else:
                         # In case of error, retry. Means that the response content is not an image.
