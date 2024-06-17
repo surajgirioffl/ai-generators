@@ -258,7 +258,7 @@ class Pixlr:
 
             with open(os.path.join(path, filename), "wb") as file:
                 file.write(image_data)
-                created_filenames.append(file.name)
+                created_filenames.append(os.path.abspath(file.name))
 
         logging.info("Images downloaded successfully...")
         return created_filenames
