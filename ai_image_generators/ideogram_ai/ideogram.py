@@ -201,6 +201,7 @@ class Ideogram:
             # In all possibility, two textarea are returning.
             prompt_textarea_selector = "textarea[placeholder='What do you want to create?']"
             self.wait.until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, prompt_textarea_selector)))
+            generate_buttons = self.driver.find_elements(By.XPATH, '//button[text()="Generate"]')  # Added on 17th June 2024
             textarea_elements = self.driver.find_elements(By.CSS_SELECTOR, prompt_textarea_selector)
 
             # Using same logic as we used in the button (given below). Using clientWidth to determine if element is visible or not.
@@ -214,7 +215,12 @@ class Ideogram:
             # No other properties like width, style.visibility, display etc working because both elements have same property but one is not visible but visibility is not set using display or style.visibility.
             # Solution is clientWidth, clientHeight, clientTop, clientLeft. element.<any_of_this_property> return value greater than 0 if element visible on the screen and have some size.
             # The clientWidth property returns the viewable width of an element in pixels, including padding, but not the border, scrollbar or margin. (Similar in case of other properties from the above line)
-            generate_buttons = self.driver.find_elements(By.XPATH, '//button[text()="Generate"]')
+
+            # generate_buttons = self.driver.find_elements(By.XPATH, '//button[text()="Generate"]')
+            # Update on 17th June 2024: Above line is commented today and it's content is copied and pasted above the line of code finding textarea elements in this if block.
+            # Issue found today is that only one generate buttons is returned. But when prompt is written and textarea is not opened then it returns two generate buttons and we need this to check which is visible.
+            # When one generate button is returned and script click it then the visible generate button is not clicked and image generation is not working at all.
+
             logging.info(f"Number of Generate buttons: {len(generate_buttons)}")
             if len(generate_buttons) > 1:
                 logging.info(f"Button-1 size: {generate_buttons[0].size}")
