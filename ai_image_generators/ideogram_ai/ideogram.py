@@ -201,7 +201,6 @@ class Ideogram:
             # In all possibility, two textarea are returning.
             prompt_textarea_selector = "textarea[placeholder='What do you want to create?']"
             self.wait.until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, prompt_textarea_selector)))
-            generate_buttons = self.driver.find_elements(By.XPATH, '//button[text()="Generate"]')  # Added on 17th June 2024
             textarea_elements = self.driver.find_elements(By.CSS_SELECTOR, prompt_textarea_selector)
 
             # Using same logic as we used in the button (given below). Using clientWidth to determine if element is visible or not.
@@ -211,22 +210,29 @@ class Ideogram:
                     break
             logging.info("Prompt written successfully..")
 
+            # Last update on 17th June 2024
+            self.driver.find_element(By.XPATH, '//div[text()="Generate"]').click()
+            return
+            # Above code return generate button only if prompt is written else it will return no element.
+            # Below code is deprecated now because it works sometime and sometime not.
+            # Because 'Generate' button changes dynamically on the page. Sometimes, there are 2 generate buttons (when textarea is not expanded) and sometime 1 generate button (when textarea is expanded) and last there is no generate button when prompt is written.
+
             # There are two generate buttons. And By fetching using querySelector, index may be different for desired textarea in different session.
             # No other properties like width, style.visibility, display etc working because both elements have same property but one is not visible but visibility is not set using display or style.visibility.
             # Solution is clientWidth, clientHeight, clientTop, clientLeft. element.<any_of_this_property> return value greater than 0 if element visible on the screen and have some size.
             # The clientWidth property returns the viewable width of an element in pixels, including padding, but not the border, scrollbar or margin. (Similar in case of other properties from the above line)
-
-            # generate_buttons = self.driver.find_elements(By.XPATH, '//button[text()="Generate"]')
+            generate_buttons = self.driver.find_elements(By.XPATH, '//button[text()="Generate"]')
             # Update on 17th June 2024: Above line is commented today and it's content is copied and pasted above the line of code finding textarea elements in this if block.
             # Issue found today is that only one generate buttons is returned. But when prompt is written and textarea is not opened then it returns two generate buttons and we need this to check which is visible.
             # When one generate button is returned and script click it then the visible generate button is not clicked and image generation is not working at all.
+            # Again uncomment the code. At this point, only one button is returned. Let's click on it. BTW Its working in browser.
 
             logging.info(f"Number of Generate buttons: {len(generate_buttons)}")
             if len(generate_buttons) > 1:
                 logging.info(f"Button-1 size: {generate_buttons[0].size}")
                 logging.info(f"Button-2 size: {generate_buttons[1].size}")  # size: {'height': 23, 'width': 75}
             else:
-                logging.info(f"Button-1 size: {generate_buttons[1].size}")
+                logging.info(f"Button-1 size: {generate_buttons[0].size}")
             # logging.info(generate_buttons[1].get_dom_attribute("clientWidth"))  # None (For DOM attributes only)
             # logging.info(generate_buttons[1].get_property("clientWidth"))  # 75
             for generate_button in generate_buttons:
