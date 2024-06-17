@@ -235,6 +235,7 @@ class AIGenerator(toga.App):
                     site_preferences=self.sites_preferences[selected_category][selected_site], driver=self.driver, *self.args, **self.kwargs
                 )
             except Exception as e:
+                status = False
                 logging.exception(f"Exception: {e}. Error Code: 2301")
                 self.main_window.error_dialog("Exception", str(e))
 
