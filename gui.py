@@ -7,6 +7,7 @@ Last-modified: 17th June 2024
 Error-series: 2300
 """
 
+import os
 import logging
 import importlib
 import toga
@@ -225,6 +226,7 @@ class AIGenerator(toga.App):
         }
 
         for selected_site in selected_sites:
+            os.chdir(os.path.dirname(__file__))
             logging.info("======================Starting a new AI Generation (With GUI Interface)=======================")
             logging.info(f"Category: {selected_category} | Site: {selected_site} | Sheet: {selected_sheet}")
 
@@ -245,6 +247,9 @@ class AIGenerator(toga.App):
             else:
                 logging.warning("======================AI Generation Failed | STATUS -> FAILED =======================")
                 self.main_window.error_dialog("Failed", f"AI Generation Failed For {selected_site}")
+
+        # Switching the CWD to root dir.
+        os.chdir(os.path.dirname(__file__))
 
     def set_attributes(self, categories: list, categories_sites_mapping: dict, sites_preferences: dict, driver=None, *args, **kwargs):
         self.categories: list = categories
