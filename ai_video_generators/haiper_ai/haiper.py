@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 17th May 2024
-Last-modified: 16th June 2024
+Last-modified: 18th June 2024
 Error-series: 1400
 """
 
@@ -171,6 +171,15 @@ class Haiper:
             bool: True if video creation is successful, False otherwise.
         """
         logging.info("Creating video with the given prompt.")
+        if not prompt:
+            logging.error("Please provide a prompt. Error Code: 1408")
+            logging.error("Prompt is required parameter. If it is missing, this error (1408) will be raised.")
+            raise ValueError("Please provide a valid prompt. Error Code: 1408")
+
+        if "haiper.ai/explore" not in self.driver.current_url:
+            logging.info("Navigating to https://haiper.ai/explore")
+            self.driver.get("https://haiper.ai/explore")
+
         try:
             create_video_with_text_div_xpath = "/html/body/main/article/section/div/div/div[2]/div[1]/div/div/div/div[1]"
             self.wait.until(EC.element_to_be_clickable((By.XPATH, create_video_with_text_div_xpath))).click()
@@ -212,6 +221,15 @@ class Haiper:
             **kwargs: Additional keyword arguments.
         """
         logging.info("Creating video with the given image.")
+
+        if not image:
+            logging.error("Please provide a Image. Error Code: 1409")
+            logging.error("Image is a required parameter. If it is missing, this error (1409) will be raised.")
+            raise ValueError("Please provide a valid image path. Error Code: 1409")
+
+        if "haiper.ai/explore" not in self.driver.current_url:
+            logging.info("Navigating to https://haiper.ai/explore")
+            self.driver.get("https://haiper.ai/explore")
 
         def wait_until_image_uploaded():
             """Wait until the image is uploaded by waiting for the presence of the specified CSS selector."""

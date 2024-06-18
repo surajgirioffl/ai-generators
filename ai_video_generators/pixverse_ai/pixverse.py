@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 9th May 2024
-Last-modified: 16th June 2024
+Last-modified: 18th June 2024
 Error-series: 1200
 """
 
@@ -145,7 +145,16 @@ def create_video_from_prompt(driver: Chrome | Edge | Any, prompt: str, seed: int
     Returns:
         None
     """
-    logging.info("Creating video from prompt...")
+    logging.info("Creating video with the given prompt.")
+    if not prompt:
+        logging.error("Please provide a prompt. Error Code: 1203")
+        logging.error("Prompt is required parameter. If it is missing, this error (1203) will be raised.")
+        raise ValueError("Please provide a valid prompt. Error Code: 1203")
+
+    if "app.pixverse.ai" not in driver.current_url:
+        logging.info("Navigating to app.pixverse.ai/")
+        driver.get("https://app.pixverse.ai/")
+
     wait = WebDriverWait(driver, 20)
 
     # Click on the 'create video' button when it appears
@@ -170,7 +179,7 @@ def create_video_from_images(
     prompt: str = "",
     hd_quality=False,
     *args,
-    **kwargs
+    **kwargs,
 ):
     """Function to create video using image.
 
@@ -203,7 +212,17 @@ def create_video_from_images(
         else:
             return True
 
-    logging.info("Creating video from images...")
+    logging.info("Creating video with the given image.")
+
+    if not image:
+        logging.error("Please provide a Image. Error Code: 1204")
+        logging.error("Image is a required parameter. If it is missing, this error (1204) will be raised.")
+        raise ValueError("Please provide a valid image path. Error Code: 1204")
+
+    if "app.pixverse.ai" not in driver.current_url:
+        logging.info("Navigating to app.pixverse.ai/")
+        driver.get("https://app.pixverse.ai/")
+
     wait = WebDriverWait(driver, 20)
 
     # Click on the 'create video' button when it appears
