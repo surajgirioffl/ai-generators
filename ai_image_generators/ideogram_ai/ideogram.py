@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 20th May 2024
-Last-modified: 17th June 2024
+Last-modified: 18th June 2024
 Error-series: 1600
 """
 
@@ -153,13 +153,16 @@ class Ideogram:
         logging.info("Image page link fetched successfully.")
 
         self.driver.get(image_page_link)
-        self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'img[src*="/api"]')))
-        images = self.driver.find_elements(By.CSS_SELECTOR, 'img[src*="/api"]')
+        self.wait.until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, 'img[src*="/assets/image/balanced/"]'))
+        )  # Updated on 18th June 2024 as per change in site
+        images = self.driver.find_elements(By.CSS_SELECTOR, 'img[src*="/assets/image/balanced/"]')
         # print(f"images: {images}")
         for image in images:
             link = image.get_attribute("src")
             print(link)
             if link.endswith(".png"):
+                # ON 18th June 2024: It will not work any more. Because, no link end with .png or any image format.
                 # There are 4 images to be fetched but 5 images are returned by the above selector because one image is current page image and it only contains src with .png.
                 # So, we skip this page specific image. BTW in rest 4, this image is also including with .jpg src.
                 continue
