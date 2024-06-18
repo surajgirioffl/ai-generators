@@ -3,7 +3,7 @@
 GUI module to provide Graphical User Interface for the application.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 09th June 2024
-Last-modified: 17th June 2024
+Last-modified: 18th June 2024
 Error-series: 2300
 """
 
@@ -246,7 +246,7 @@ class AIGenerator(toga.App):
                 self.main_window.info_dialog("Success", f"AI Generation Completed Successfully For {selected_site}")
             else:
                 logging.warning("======================AI Generation Failed | STATUS -> FAILED =======================")
-                self.main_window.error_dialog("Failed", f"AI Generation Failed For {selected_site}")
+                # self.main_window.error_dialog("Failed", f"AI Generation Failed For {selected_site}")
 
         # Switching the CWD to root dir.
         os.chdir(os.path.dirname(__file__))
