@@ -91,9 +91,7 @@ class Pixlr:
         **kwargs,
     ) -> None:
         logging.info("Generating image...")
-        if "pixlr.com/image-generator" not in self.driver.current_url:
-            logging.info("URL of image generator page not found. Redirecting...")
-            self.driver.get(self.URL)
+        self.driver.get(Pixlr.URL)
 
         # Clicking on the prompt-options container. So, all elements appear on the screen.
         self.wait.until(EC.visibility_of_element_located((By.ID, "generator-main-modal"))).click()
