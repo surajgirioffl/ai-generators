@@ -112,7 +112,8 @@ class Ideogram:
                 with requests.Session() as session:
                     session.headers.update(headers)
                     response = session.get(link)
-                    if response.headers.get("Content-Type") == "image/jpeg":
+                    logging.info(f"Response Content-Type: {response.headers.get('Content-Type')}")
+                    if "image/" in response.headers.get("Content-Type"):
                         with open(os.path.join(path, filename), "wb") as file:
                             file.write(response.content)
                             created_filenames.append(os.path.abspath(file.name))
