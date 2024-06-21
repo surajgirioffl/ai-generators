@@ -2,11 +2,11 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 16th June 2024
-Last-modified: 17th June 2024
+Last-modified: 21st June 2024
 Error-series: 2400
 """
 
-from sqlalchemy import Integer, String, ForeignKey, create_engine
+from sqlalchemy import Integer, String, DateTime, ForeignKey, create_engine
 from sqlalchemy.orm import DeclarativeBase, mapped_column, sessionmaker, Session
 
 
@@ -39,6 +39,7 @@ class Output(Base):
     site_id = mapped_column(Integer, ForeignKey(Sites.id), nullable=False)
     prompt_id = mapped_column(Integer, ForeignKey(Prompts.id), nullable=True)
     image_id = mapped_column(Integer, ForeignKey(Images.id), nullable=True)
+    timestamp = mapped_column(DateTime, nullable=True, server_default="CURRENT_TIMESTAMP")
 
 
 engine = create_engine("sqlite:///ai_generator.db", echo=False)
