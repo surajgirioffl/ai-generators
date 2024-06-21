@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 17th May 2024
-Last-modified: 17th June 2024
+Last-modified: 21st June 2024
 Error-series: 1300
 """
 
@@ -286,6 +286,7 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
         for index, prompt in enumerate(prompts):
             site_preferences["options"]["prompt"] = prompt
             logging.info(f"Initiating image generation for the prompt index {index}...")
+            haiper.create_video_with_prompt(**site_preferences["options"])
             downloaded_video_path = haiper.download_video(
                 haiper.fetch_generated_video_link(), CONFIG["Default_location_start"]["default_output_location_local"]
             )
