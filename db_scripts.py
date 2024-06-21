@@ -3,9 +3,10 @@
 You can import this module to perform database operations for any site.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 17th June 2024
-Last-modified: 17th June 2024
+Last-modified: 21st June 2024
 """
 
+from datetime import datetime
 from models import Sites, Prompts, Images, Output, get_new_session
 
 
@@ -90,10 +91,20 @@ class AIGeneratorDB:
             image_id (str, optional): The ID of the image (default is None).
         """
         if isinstance(file_path, str):
-            self.session.add(Output(file_path=file_path, category=category, site_id=site_id, prompt_id=prompt_id, image_id=image_id))
+            self.session.add(
+                Output(
+                    file_path=file_path,
+                    category=category,
+                    site_id=site_id,
+                    prompt_id=prompt_id,
+                    image_id=image_id,
+                    timestamp=datetime.now(),
+                )
+            )
         else:
             rows = [
-                Output(file_path=path, category=category, site_id=site_id, prompt_id=prompt_id, image_id=image_id) for path in file_path
+                Output(file_path=path, category=category, site_id=site_id, prompt_id=prompt_id, image_id=image_id, timestamp=datetime.now())
+                for path in file_path
             ]
             self.session.add_all(rows)
         self.session.commit()
