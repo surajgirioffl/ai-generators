@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 17th May 2024
-Last-modified: 18th June 2024
+Last-modified: 21st June 2024
 Error-series: 1400
 """
 
@@ -47,22 +47,30 @@ class Haiper:
         self.driver.get(URL)
 
         try:
-            # Click on the button 'login with Google' when it appears
-            login_with_google_xpath = "/html/body/main/article/section/div/div[1]/div[2]/button[2]"
-            self.wait.until(EC.element_to_be_clickable((By.XPATH, login_with_google_xpath))).click()
+            # Click on the login button
+            logging.info('Clicking on the "Login" Button.')
+            self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".px-1"))).click()
 
-            # Account selection is compulsory in haiper
-            logging.info("Selecting Google account.")
-            self.wait.until(EC.url_contains("oauthchooseaccount"))  # Wait until account selection page opens
-            select_account_div_xpath = (
-                '//*[@id="yDmH0d"]/div[1]/div[1]/div[2]/div/div/div[2]/div/div/div[1]/form/span/section/div/div/div/div/ul/li[1]/div'
-            )
-            self.wait.until(EC.element_to_be_clickable((By.XPATH, select_account_div_xpath))).click()
+            # Click on the button 'Continue with Google' when it appears
+            logging.info("Clicking on the 'Continue with Google' Button.")
+            self.wait.until(EC.element_to_be_clickable((By.ID, "btn-google"))).click()
 
             # Wait until login success
-            self.wait.until(EC.url_contains("haiper.ai/explore"))
+            logging.info("Waiting until login success.")
+            self.wait.until(EC.url_to_be("https://haiper.ai/"))
+
+            # Removing pop-up message if available
+            try:
+                logging.info("Fetching pop message container...")
+                WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "sr-only"))).click()
+            except TimeoutException:
+                logging.info("Pop-up message not found in 4 sec")
+            else:
+                logging.info("Pop-up message removed.")
+
         except Exception as e:
             print("Login failed. Error Code: 1401")
+            logging.info(f"Current URL: {self.driver.current_url}")
             logging.error("Login failed. Error Code: 1401")
             logging.exception(f"Exception: {e}")
             return False
@@ -176,9 +184,9 @@ class Haiper:
             logging.error("Prompt is required parameter. If it is missing, this error (1408) will be raised.")
             raise ValueError("Please provide a valid prompt. Error Code: 1408")
 
-        if "haiper.ai/explore" not in self.driver.current_url:
-            logging.info("Navigating to https://haiper.ai/explore")
-            self.driver.get("https://haiper.ai/explore")
+        if self.driver.current_url == "https://haiper.ai/":
+            logging.info("Navigating to https://haiper.ai/")
+            self.driver.get("https://haiper.ai/")
 
         try:
             create_video_with_text_div_xpath = "/html/body/main/article/section/div/div/div[2]/div[1]/div/div/div/div[1]"
@@ -227,9 +235,9 @@ class Haiper:
             logging.error("Image is a required parameter. If it is missing, this error (1409) will be raised.")
             raise ValueError("Please provide a valid image path. Error Code: 1409")
 
-        if "haiper.ai/explore" not in self.driver.current_url:
-            logging.info("Navigating to https://haiper.ai/explore")
-            self.driver.get("https://haiper.ai/explore")
+        if self.driver.current_url == "https://haiper.ai/":
+            logging.info("Navigating to https://haiper.ai/")
+            self.driver.get("https://haiper.ai/")
 
         def wait_until_image_uploaded():
             """Wait until the image is uploaded by waiting for the presence of the specified CSS selector."""
