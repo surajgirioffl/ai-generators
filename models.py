@@ -8,6 +8,7 @@ Error-series: 2400
 
 from sqlalchemy import Integer, String, DateTime, ForeignKey, create_engine
 from sqlalchemy.orm import DeclarativeBase, mapped_column, sessionmaker, Session
+from datetime import datetime
 
 
 class Base(DeclarativeBase):
@@ -39,7 +40,7 @@ class Output(Base):
     site_id = mapped_column(Integer, ForeignKey(Sites.id), nullable=False)
     prompt_id = mapped_column(Integer, ForeignKey(Prompts.id), nullable=True)
     image_id = mapped_column(Integer, ForeignKey(Images.id), nullable=True)
-    timestamp = mapped_column(DateTime, nullable=True, server_default="CURRENT_TIMESTAMP")
+    timestamp = mapped_column(DateTime, nullable=False, default=datetime.now())
 
 
 engine = create_engine("sqlite:///ai_generator.db", echo=False)
