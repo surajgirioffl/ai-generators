@@ -62,7 +62,8 @@ class Haiper:
             # Removing pop-up message if available
             try:
                 logging.info("Fetching pop message container...")
-                WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "sr-only"))).click()
+                pop_message_close_button_xpath = "//span[@class='sr-only']/parent::*[1]/parent::*[1]"
+                WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.XPATH, pop_message_close_button_xpath))).click()
             except TimeoutException:
                 logging.info("Pop-up message not found in 4 sec")
             else:
