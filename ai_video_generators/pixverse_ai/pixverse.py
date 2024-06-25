@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 9th May 2024
-Last-modified: 18th June 2024
+Last-modified: 26th June 2024
 Error-series: 1200
 """
 
@@ -30,11 +30,16 @@ def login_with_google(driver: Chrome | Edge | Any) -> None:
     Returns:
         None
     """
+    logging.info("Login with Google...")
     driver.get(URL)
     wait = WebDriverWait(driver, 20)
     # Click on the button 'login with Google' when it appears
-    login_with_google_selector = ".ant-btn.css-17a3nt7.ant-btn-default.w-full.border-none"
+    login_with_google_selector = ".ant-btn-default.w-full.border-none"  # This selector will return two buttons. Select 1st one for Google.
     wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, login_with_google_selector))).click()
+    logging.info("Login with Google Button clicked...")
+    logging.info("waiting until url changes to /home route.")
+    WebDriverWait(driver, 60).until(expected_conditions.url_contains("app.pixverse.ai/home"))
+    logging.info("Login successful...")
 
 
 def download_video(link: str, path: str, filename: str = None) -> str:
@@ -151,18 +156,17 @@ def create_video_from_prompt(driver: Chrome | Edge | Any, prompt: str, seed: int
         logging.error("Prompt is required parameter. If it is missing, this error (1203) will be raised.")
         raise ValueError("Please provide a valid prompt. Error Code: 1203")
 
-    if "app.pixverse.ai" not in driver.current_url:
-        logging.info("Navigating to app.pixverse.ai/")
-        driver.get("https://app.pixverse.ai/")
+    if "app.pixverse.ai/home" not in driver.current_url:
+        logging.info("Navigating to https://app.pixverse.ai/home")
+        driver.get("https://app.pixverse.ai/home")
 
     wait = WebDriverWait(driver, 20)
 
     # Click on the 'create video' button when it appears
-    create_video_button_selector = ".ant-btn.css-sjdo89.ant-btn-default.px-8.border-none.rounded-full"
-    wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, create_video_button_selector))).click()
+    text_to_video_button_selector = ".flex.flex-col.gap-1"
+    wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, text_to_video_button_selector))).click()
 
-    text_button_selector = ".p-2.rounded-md.cursor-pointer.flex.items-center.gap-2"
-    driver.find_element(By.CSS_SELECTOR, text_button_selector).click()
+    WebDriverWait(driver, 60).until(expected_conditions.visibility_of_element_located((By.ID, "Prompt")))
     driver.find_element(By.ID, "Prompt").send_keys(prompt)  # Prompt
     seed_button_selector = 'input[role="spinbutton"]'
     driver.find_element(By.CSS_SELECTOR, seed_button_selector).send_keys(seed)
@@ -219,18 +223,16 @@ def create_video_from_images(
         logging.error("Image is a required parameter. If it is missing, this error (1204) will be raised.")
         raise ValueError("Please provide a valid image path. Error Code: 1204")
 
-    if "app.pixverse.ai" not in driver.current_url:
-        logging.info("Navigating to app.pixverse.ai/")
-        driver.get("https://app.pixverse.ai/")
+    if "app.pixverse.ai/home" not in driver.current_url:
+        logging.info("Navigating to https://app.pixverse.ai/home")
+        driver.get("https://app.pixverse.ai/home")
 
     wait = WebDriverWait(driver, 20)
 
     # Click on the 'create video' button when it appears
-    create_video_button_selector = ".ant-btn.css-sjdo89.ant-btn-default.px-8.border-none.rounded-full"
-    wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, create_video_button_selector))).click()
-
-    create_video_from_image_button_selector = ".p-2.rounded-md.cursor-pointer.flex.items-center.gap-2"
-    driver.find_elements(By.CSS_SELECTOR, create_video_from_image_button_selector)[1].click()
+    image_2_video_button_selector = ".flex.flex-col.gap-1"
+    wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, image_2_video_button_selector)))
+    driver.find_elements(By.CSS_SELECTOR, image_2_video_button_selector)[1].click()
 
     # Image upload button
     # image_upload_button_selector = ".ant-btn.css-1ntsptu.ant-btn-text.ant-btn-sm"
