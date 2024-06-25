@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 7th May 2024
-Last-modified: 17th June 2024
+Last-modified: 25th June 2024
 Error-series: 1100
 """
 
@@ -207,6 +207,7 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
     local_webdriver = False
     if not driver:
         driver = get_webdriver_instance()
+        driver.maximize_window()
         local_webdriver = True
 
     if site_preferences.get("login_required"):
