@@ -2,7 +2,7 @@
 
 You can import this module to perform database operations for any site.
 Author: Suraj Kumar Giri (@surajgirioffl)
-Init-date: 17th June 2024
+Init-date: 28th June 2024
 Last-modified: 21st June 2024
 """
 
@@ -107,4 +107,20 @@ class AIGeneratorDB:
                 for path in file_path
             ]
             self.session.add_all(rows)
+        self.session.commit()
+
+    def insert_sites_if_not_exist(self, sites: list):
+        """Insert sites into the database if they do not already exist.
+
+        Args:
+            sites (list): A list of sites to be inserted.
+
+        Returns:
+            None
+        """
+        for site in sites:
+            row = self.session.query(Sites).filter_by(site=site).first()
+            if not row:
+                # If site doesn't exit.
+                self.session.add(Sites(site=site))
         self.session.commit()
