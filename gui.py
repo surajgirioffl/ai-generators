@@ -3,7 +3,7 @@
 GUI module to provide Graphical User Interface for the application.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 09th June 2024
-Last-modified: 18th June 2024
+Last-modified: 28th June 2024
 Error-series: 2300
 """
 
@@ -231,8 +231,10 @@ class AIGenerator(toga.App):
             logging.info(f"Category: {selected_category} | Site: {selected_site} | Sheet: {selected_sheet}")
 
             module = f"{category_package_name_mapping[selected_category]}.{selected_site}_ai.main"
+            logging.info(f"Importing module: {module}")
             module = importlib.import_module(module)
             try:
+                logging.info("Calling the main() function of the module...")
                 status: bool = module.main(
                     site_preferences=self.sites_preferences[selected_category][selected_site], driver=self.driver, *self.args, **self.kwargs
                 )
