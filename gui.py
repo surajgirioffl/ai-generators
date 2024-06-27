@@ -210,13 +210,15 @@ class AIGenerator(toga.App):
         """
         # Updating prompts/images for the selected site
         for selected_site in selected_sites:
-            if "prompt" in self.sites_preferences[selected_category][selected_site]["options"].keys():
-                # BTW Above condition is not required. If prompt key doesn't exist then 'prompt' key will created and accepted by **kwargs of the function which accept this site options as args.
+            # BTW image2video sites have both options prompt as well as image and prompt is optional.
+            # Currently, the application supports only image in case of image (not prompt with image)
+            # That's why, checking image option first. If found then fetch images only and don't go for prompt.
+            if "image" in self.sites_preferences[selected_category][selected_site]["options"].keys():
+                images: list = PreferenceManager.fetch_all_images(selected_sheet)
+                self.sites_preferences[selected_category][selected_site]["options"]["image"] = images
+            elif "prompt" in self.sites_preferences[selected_category][selected_site]["options"].keys():
                 prompts: list = PreferenceManager.fetch_all_prompts(selected_sheet)
                 self.sites_preferences[selected_category][selected_site]["options"]["prompt"] = prompts
-            elif "image" in self.sites_preferences[selected_category][selected_site]["options"].keys():
-                images: list = PreferenceManager.fetch_all_prompts(selected_sheet)
-                self.sites_preferences[selected_category][selected_site]["options"]["image"] = images
 
         category_package_name_mapping: dict[str, str] = {
             "text_to_video": "ai_video_generators",
