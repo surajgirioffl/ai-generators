@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 09th June 2024
-Last-modified: 17th June 2024
+Last-modified: 28th June 2024
 Error-series: 3100
 """
 
@@ -18,6 +18,7 @@ import cli
 import gui
 from excel_preference_manager import PreferenceManager
 import tools
+from db_scripts import AIGeneratorDB
 
 APP_REQUIRED_DIRS = ["appdata", "appdata/logs", "appdata/profile"]
 
@@ -41,6 +42,11 @@ def main() -> None:
     preference_manager = PreferenceManager()
     categories, categories_sites_mapping = preference_manager.fetch_categories_and_sites()
     sites_preferences: dict = preference_manager.fetch_sites_preferences()
+
+    sites = []
+    for value in categories_sites_mapping.values():
+        sites += value
+    AIGeneratorDB().insert_sites_if_not_exist(list(set(sites)))
 
     # driver = tools.get_webdriver_instance(profile_dir_path=f"{os.getcwd()}/appdata/profile")
     # driver.maximize_window()
