@@ -16,7 +16,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver import Chrome, Edge
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementClickInterceptedException
 from selenium.webdriver.common.action_chains import ActionChains
 
 URL = "https://ideogram.ai/"
@@ -200,26 +200,52 @@ class Ideogram:
             logging.info("Navigating to ideogram.ai/t/top/1")
             self.driver.get("https://ideogram.ai/t/top/1")
 
+        def remove_popup(wait_time=3):
+            # Pop message remover (Added 30 June 2024)
+            # document.querySelector('div[role="dialog"]').querySelector("button").click()
+            try:
+                logging.info("Waiting for pop div...")
+                pop_up_div = WebDriverWait(self.driver, wait_time).until(
+                    EC.visibility_of_element_located((By.CSS_SELECTOR, 'div[role="dialog"]'))
+                )
+            except Exception:
+                logging.info("Pop up div not found in 3 second...")
+            else:
+                logging.info("Pop up div found. Removing it.")
+                pop_up_div.find_element(By.TAG_NAME, "button").click()
+                logging.info("Pop up removed successfully...")
+
         screen_width = self.driver.execute_script("return window.innerWidth")
         if screen_width >= 900:
             logging.info("Screen width is greater that 900px (or equal to)")
             logging.info("Trying to fetch the textarea element.")
             # In this case, there are two textarea elements with same selector. By fetching using querySelector, index may be different for desired textarea in different session.
             # In all possibility, two textarea are returning.
-            prompt_textarea_selector = "textarea[placeholder='What do you want to create?']"
-            self.wait.until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, prompt_textarea_selector)))
-            textarea_elements = self.driver.find_elements(By.CSS_SELECTOR, prompt_textarea_selector)
+            for _ in range(2):
+                try:
+                    prompt_textarea_selector = "textarea[placeholder='What do you want to create?']"
+                    self.wait.until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, prompt_textarea_selector)))
+                    textarea_elements = self.driver.find_elements(By.CSS_SELECTOR, prompt_textarea_selector)
 
-            # Using same logic as we used in the button (given below). Using clientWidth to determine if element is visible or not.
-            for textarea_element in textarea_elements:
-                if int(textarea_element.get_property("clientWidth")) > 0:
-                    textarea_element.send_keys(prompt)
-                    break
-            logging.info("Prompt written successfully..")
+                    # Using same logic as we used in the button (given below). Using clientWidth to determine if element is visible or not.
+                    for textarea_element in textarea_elements:
+                        if int(textarea_element.get_property("clientWidth")) > 0:
+                            textarea_element.send_keys(prompt)
+                            break
+                    logging.info("Prompt written successfully..")
 
-            # Last update on 17th June 2024
-            self.driver.find_element(By.XPATH, '//div[text()="Generate"]').click()
-            return
+                    # Last update on 17th June 2024
+                    self.driver.find_element(By.XPATH, '//div[text()="Generate"]').click()
+                except Exception as e:
+                    logging.error(f"Exception: {e}")
+                    logging.info("Removing pop-message if available and try again..")
+                    remove_popup()
+                    continue
+                else:
+                    return
+
+            logging.error("Loop exhausted but option has not been performed. Error Code: 1603")
+
             # Above code return generate button only if prompt is written else it will return no element.
             # Below code is deprecated now because it works sometime and sometime not.
             # Because 'Generate' button changes dynamically on the page. Sometimes, there are 2 generate buttons (when textarea is not expanded) and sometime 1 generate button (when textarea is expanded) and last there is no generate button when prompt is written.
