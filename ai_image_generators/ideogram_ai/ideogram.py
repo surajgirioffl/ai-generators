@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 20th May 2024
-Last-modified: 18th June 2024
+Last-modified: 30th June 2024
 Error-series: 1600
 """
 
@@ -154,10 +154,13 @@ class Ideogram:
         logging.info("Image page link fetched successfully.")
 
         self.driver.get(image_page_link)
-        self.wait.until(
-            EC.visibility_of_element_located((By.CSS_SELECTOR, 'img[src*="/assets/image/balanced/"]'))
-        )  # Updated on 18th June 2024 as per change in site
-        images = self.driver.find_elements(By.CSS_SELECTOR, 'img[src*="/assets/image/balanced/"]')
+        # self.wait.until(
+        # EC.visibility_of_element_located((By.CSS_SELECTOR, 'img[src*="/assets/image/balanced/"]'))
+        # )  # Updated on 18th June 2024 as per change in site. Again updated on 20 june as per change in site
+        cover_image_sibling_para = self.wait.until(EC.visibility_of_element_located((By.XPATH, "//p[text()='Cover']")))
+        images_parent_div = cover_image_sibling_para.find_element(By.XPATH, "../..")
+
+        images = images_parent_div.find_elements(By.TAG_NAME, "img")
         # print(f"images: {images}")
         for image in images:
             link = image.get_attribute("src")
