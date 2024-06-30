@@ -119,21 +119,26 @@ def fetch_generated_video_link(driver: Chrome | Edge | Any) -> str | bool:
     # Now, wait until the message div will removed from the DOM because when video will be generated then this div will no longer attached to the DOM.
     wait_300 = WebDriverWait(driver, 600)  # Video generation takes time.
     try:
+        logging.info("Waiting until the video generation message div disappears.")
         wait_300.until_not(expected_conditions.presence_of_element_located((By.CSS_SELECTOR, ".text-base.text-center")))
     except TimeoutException:
         print("Video generating taking too much time (10 min+). Error Code: 1202")
         logging.log("Video generating taking too much time (10 min+). Error Code: 1202")
         return False
 
-    ###########################################
+    logging.info("Video generation message div disappear successfully.")
+
     # at this point, the video has been generated and the div is removed from the DOM.
     driver.get(generated_video_link)
 
+    logging.info("Video generated. Fetching video element...")
     wait_300.until(expected_conditions.visibility_of_element_located((By.TAG_NAME, "video")))
     generated_video_public_link = driver.find_element(By.TAG_NAME, "video").get_attribute("src")
+    logging.info(f"Found video link: {generated_video_public_link}")
 
     # Now going back to the 'create-video' page
     # driver.find_element(By.CSS_SELECTOR, 'svg[data-icon="arrow-left"]').parent.click() (Not working)
+    logging.info("Going back to the last page...")
     arrow_left_svg = driver.find_element(By.CSS_SELECTOR, 'svg[data-icon="arrow-left"]')
     arrow_left_svg_parent = arrow_left_svg.find_element(By.XPATH, "./..")
     arrow_left_svg_parent.click()
