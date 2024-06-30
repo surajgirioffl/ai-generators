@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 9th May 2024
-Last-modified: 26th June 2024
+Last-modified: 30th June 2024
 Error-series: 1200
 """
 
@@ -93,47 +93,51 @@ def fetch_generated_video_link(driver: Chrome | Edge | Any) -> str | bool:
     - Use requests lib and download the video.
     """
     # First waiting and checking if the div specifying the video generation is present or not.
-    wait = WebDriverWait(driver, 3)
+    wait = WebDriverWait(driver, 10)
 
     for _ in range(3):
         try:
-            video_generation_info_div = wait.until(
-                expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, ".text-white.text-base.text-center"))
+            logging.info("Waiting for div specifying the video generation process...")
+            video_generation_info_div = WebDriverWait(driver, 30).until(
+                expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, ".text-base.text-center"))
             )
         except TimeoutException:
             # Div is not present means button is clicked.
             logging.info("Div specifying the video generation is not present. Clicking the submit button again...")
-            submit_button_selector = 'button[type="submit"]'
-            wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, submit_button_selector))).click()
+            submit_button_xpath = "//span[text()='Create']//ancestor::button[1]"
+            wait.until(expected_conditions.element_to_be_clickable((By.XPATH, submit_button_xpath)))
+            driver.find_element(By.XPATH, submit_button_xpath).click()
         else:
             # if no exception
             # Div is present.
+            logging.info("Video generation div found. Click on it...")
             video_generation_info_div.click()
             sleep(5)
             generated_video_link = driver.current_url
-
-            # Now going back to the 'create-video' page
-            # driver.find_element(By.CSS_SELECTOR, 'svg[data-icon="arrow-left"]').parent.click()
-            arrow_left_svg = driver.find_element(By.CSS_SELECTOR, 'svg[data-icon="arrow-left"]')
-            arrow_left_svg_parent = arrow_left_svg.find_element(By.XPATH, "./..")
-            arrow_left_svg_parent.click()
             break
 
     # Now, wait until the message div will removed from the DOM because when video will be generated then this div will no longer attached to the DOM.
     wait_300 = WebDriverWait(driver, 600)  # Video generation takes time.
     try:
-        wait_300.until_not(expected_conditions.presence_of_element_located((By.CSS_SELECTOR, ".text-white.text-base.text-center")))
+        wait_300.until_not(expected_conditions.presence_of_element_located((By.CSS_SELECTOR, ".text-base.text-center")))
     except TimeoutException:
         print("Video generating taking too much time (10 min+). Error Code: 1202")
         logging.log("Video generating taking too much time (10 min+). Error Code: 1202")
         return False
 
+    ###########################################
     # at this point, the video has been generated and the div is removed from the DOM.
     driver.get(generated_video_link)
 
-    WebDriverWait(driver, 30).until(expected_conditions.visibility_of_element_located((By.TAG_NAME, "video")))
+    wait_300.until(expected_conditions.visibility_of_element_located((By.TAG_NAME, "video")))
     generated_video_public_link = driver.find_element(By.TAG_NAME, "video").get_attribute("src")
-    driver.get(URL.strip("login"))  # Returning to the dashboard
+
+    # Now going back to the 'create-video' page
+    # driver.find_element(By.CSS_SELECTOR, 'svg[data-icon="arrow-left"]').parent.click() (Not working)
+    arrow_left_svg = driver.find_element(By.CSS_SELECTOR, 'svg[data-icon="arrow-left"]')
+    arrow_left_svg_parent = arrow_left_svg.find_element(By.XPATH, "./..")
+    arrow_left_svg_parent.click()
+
     return generated_video_public_link
 
 
@@ -160,19 +164,20 @@ def create_video_from_prompt(driver: Chrome | Edge | Any, prompt: str, seed: int
         logging.info("Navigating to app.pixverse.ai/create/video/text")
         driver.get("https://app.pixverse.ai/create/video/text")
 
-    wait = WebDriverWait(driver, 20)
-
-    # Click on the 'create video' button when it appears
-    text_to_video_button_selector = ".flex.flex-col.gap-1"
-    wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, text_to_video_button_selector))).click()
-
     WebDriverWait(driver, 60).until(expected_conditions.visibility_of_element_located((By.ID, "Prompt")))
-    driver.find_element(By.ID, "Prompt").send_keys(prompt)  # Prompt
+    prompt_textarea = driver.find_element(By.ID, "Prompt")
+    prompt_textarea.clear()
+    prompt_textarea.send_keys(prompt)  # Prompt
     seed_button_selector = 'input[role="spinbutton"]'
     driver.find_element(By.CSS_SELECTOR, seed_button_selector).send_keys(seed)
-    submit_button_selector = 'button[type="submit"]'
-    wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, submit_button_selector)))
-    driver.find_element(By.CSS_SELECTOR, submit_button_selector).click()
+    logging.info("Prompt written successfully...")
+
+    wait = WebDriverWait(driver, 20)
+    submit_button_selector = 'button[type="button"]'
+    wait.until(expected_conditions.presence_of_all_elements_located((By.CSS_SELECTOR, submit_button_selector)))
+    create_button = driver.find_elements(By.CSS_SELECTOR, submit_button_selector)[1]
+    wait.until(expected_conditions.element_to_be_clickable(create_button)).click()
+    logging.info("Create button clicked successfully...")
 
 
 def create_video_from_images(
@@ -229,24 +234,18 @@ def create_video_from_images(
 
     wait = WebDriverWait(driver, 20)
 
-    # Click on the 'create video' button when it appears
-    image_2_video_button_selector = ".flex.flex-col.gap-1"
-    wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, image_2_video_button_selector)))
-    driver.find_elements(By.CSS_SELECTOR, image_2_video_button_selector)[1].click()
-
     # Image upload button
     # image_upload_button_selector = ".ant-btn.css-1ntsptu.ant-btn-text.ant-btn-sm"
     image_file_input_selector = 'input[type="file"]'
     wait.until(expected_conditions.presence_of_element_located((By.CSS_SELECTOR, image_file_input_selector))).send_keys(image)
-    driver.find_element(By.ID, "Prompt").send_keys(prompt)  # Prompt if any
-    motion_strength_input_xpath = (
-        '//*[@id="root"]/div/div/div[2]/div/main/div[1]/div/div[1]/form/div/div[5]/div[2]/div/div/div/div/div[1]/div/div[2]/input'
-    )
-    driver.find_element(By.XPATH, motion_strength_input_xpath).send_keys(motion_strength)
-    seed_button_selector = (
-        '//*[@id="root"]/div/div/div[2]/div/main/div[1]/div/div[1]/form/div/div[6]/div[2]/div/div/div/div/div[1]/div[1]/div[2]/input'
-    )
-    driver.find_element(By.XPATH, seed_button_selector).send_keys(seed)
+    if prompt:
+        prompt_textarea = driver.find_element(By.ID, "Prompt")
+        prompt_textarea.clear()
+        prompt_textarea.send_keys(prompt)  # Prompt if any
+    motion_strength_input_selector = 'input[aria-valuemin="0.01"]'
+    driver.find_element(By.CSS_SELECTOR, motion_strength_input_selector).send_keys(motion_strength)
+    seed_button_selector = 'input[step="1"]'
+    driver.find_element(By.CSS_SELECTOR, seed_button_selector).send_keys(seed)
     quality_button = driver.find_element(By.ID, "Quality")
     if quality_button.get_property("aria-checked") == "false":
         if hd_quality:
@@ -259,6 +258,6 @@ def create_video_from_images(
     if not wait_until_image_uploaded():
         return False
 
-    submit_button_selector = 'button[type="submit"]'
-    wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, submit_button_selector)))
-    driver.find_element(By.CSS_SELECTOR, submit_button_selector).click()
+    submit_button_xpath = "//span[text()='Create']//ancestor::button[1]"
+    wait.until(expected_conditions.element_to_be_clickable((By.XPATH, submit_button_xpath)))
+    driver.find_element(By.XPATH, submit_button_xpath).click()
