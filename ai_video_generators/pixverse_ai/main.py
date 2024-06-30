@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 7th May 2024
-Last-modified: 25th June 2024
+Last-modified: 30th June 2024
 Error-series: 1100
 """
 
@@ -30,8 +30,11 @@ else:
     from db_scripts import AIGeneratorDB
     from . import pixverse
 
+logging.info(f"Old CWD: {os.getcwd()}")
+logging.info("Changing CWD.")
 PROJECT_DIR = os.path.dirname(__file__)
 os.chdir(PROJECT_DIR)  # Changing the current working directory to the project directory.
+logging.info(f"New CWD: {os.getcwd()}")
 
 
 def configure_logging(filename: str = "appdata/script.log") -> None:

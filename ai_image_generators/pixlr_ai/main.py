@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 29th May 2024
-Last-modified: 17th June 2024
+Last-modified: 30th June 2024
 Error-series: 1400
 """
 
@@ -23,8 +23,11 @@ else:
     from .pixlr import Pixlr
 
 
+logging.info(f"Old CWD: {os.getcwd()}")
+logging.info("Changing CWD.")
 PROJECT_DIR = os.path.dirname(__file__)
 os.chdir(PROJECT_DIR)
+logging.info(f"New CWD: {os.getcwd()}")
 
 APP_REQUIRED_DIRS = ["appdata", "appdata/logs", "appdata/profile", "output"]
 SETTINGS: dict = tools.load_settings("config.json")

@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 23rd May 2024
-Last-modified: 17th June 2024
+Last-modified: 30th June 2024
 Error-series: 1100
 """
 
@@ -23,9 +23,11 @@ else:
     from .wordhero import WordHero
     from db_scripts import AIGeneratorDB
 
-
+logging.info(f"Old CWD: {os.getcwd()}")
+logging.info("Changing CWD.")
 PROJECT_DIR = os.path.dirname(__file__)
 os.chdir(PROJECT_DIR)  # Changing the current working directory to the project directory.
+logging.info(f"New CWD: {os.getcwd()}")
 SETTINGS: dict = tools.load_settings("config.json")
 
 APP_REQUIRED_DIRS = ["appdata", "appdata/logs", "appdata/profile", SETTINGS["output_location"]]
