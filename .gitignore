@@ -166,3 +166,5 @@ temp/
 appdata/
 profile/
 *.db
+!myapp.spec
+*.exe
