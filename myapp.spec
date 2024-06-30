@@ -56,8 +56,8 @@ pyz = PYZ(a.pure)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
+    # a.binaries,
+    # a.datas,
     [],
     name="AI Generators",
     debug=False,
@@ -72,4 +72,15 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+)
+
+coll = COLLECT(
+    exe,
+    a.scripts,
+    a.binaries,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name="ai_generator",
 )
