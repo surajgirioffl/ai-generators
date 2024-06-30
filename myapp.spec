@@ -5,6 +5,11 @@ import os
 import sys
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 
+# Below imports are not necessary. These are automatically imported by pyinstaller. But I added to avoid error message in editor.
+from PyInstaller.building.build_main import Analysis
+from PyInstaller.building.api import PYZ, EXE, COLLECT
+
+
 os.environ["TOGA_BACKEND"] = "winforms"
 sys.path.insert(0, os.getcwd())
 
@@ -60,7 +65,7 @@ exe = EXE(
     strip=False,
     upx=True,
     upx_exclude=[],
-    runtime_tmpdir=None,
+    runtime_tmpdir=f"{os.getcwd()}\\temp\\testing_exe",  # Only for standalone EXE
     console=True,
     disable_windowed_traceback=False,
     argv_emulation=False,
