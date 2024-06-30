@@ -61,6 +61,7 @@ exe = EXE(
     [],
     name="AI Generators",
     debug=False,
+    exclude_binaries=True,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
