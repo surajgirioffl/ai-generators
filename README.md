@@ -10,9 +10,9 @@
     * [For Chrome](https://chromewebstore.google.com/detail/markdown-reader/medapdbncneneejhbgcjceippjlfkmkg)
     * [For Edge](https://chromewebstore.google.com/detail/markdown-viewer/ckkdlimhmcjmikdlpkmbgfkaikojcbjk)
 
-## 1. Installation Docs (One Time)
+## 1. Installation Docs (One Time Process)
 
-### Python (windows)
+### Installing Python (windows)
 
 * Download and install Python from [here](https://www.python.org/downloads/).
 * Check if Python is installed properly or not.
@@ -24,6 +24,25 @@
 * Open command prompt (any terminal) in the project directory (Not required in case of providing absolute path of the `requirements.txt`)
 * Write command `pip install -r requirements.txt` and press enter.
 * Wait until all dependencies have been installed.
+
+### Installing Webdriver
+
+* Visit to [GoogleChromeLabs](https://googlechromelabs.github.io/chrome-for-testing/).
+* Navigate to `Stable` channel then click and copy the `URL` of Binary named as `chromedriver` for your platform (say win64).
+* Open new table of your browser and paste the copied link. It will download a zip file.
+* Extract the zip file using any extractor (like WinRAR).
+* Now, Open the extracted directory and copy it's path. Make sure that it contains an EXE named as `chromedriver.exe`.
+* Now, We have to add that directory to the PATH.
+  * To add the directory path to system environment PATH. Follow following steps:
+  * Open `Control Panel`
+  * Search for `path`
+  * Click on `Edit the system environment variables`
+  * Click on `Environments Variables`
+  * Double click on `path` variable of the section named as `User variable for <your system username>`
+  * Click on `New`
+  * Now paste the directory path in the appeared textbox.
+  * Now, click on OK > OK > OK
+  * ALL DONE ✅👍
 
 ## 2. Starting the application
 
