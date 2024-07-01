@@ -240,7 +240,7 @@ class Ideogram:
                     total_time = 200
                     while True:
                         logging.info("Trying to find generate button...")
-                        generate_button = EC.visibility_of_element_located((By.XPATH, '//div[text()="Generate"]'))
+                        generate_button = self.driver.find_element(By.XPATH, '//div[text()="Generate"]')
                         if generate_button:
                             logging.info("Generate button found.")
                             textarea_element.click()
@@ -252,6 +252,7 @@ class Ideogram:
                                 raise TimeoutException("Generate button is not found even after 200 seconds...")
                             logging.info("Trying again to find generate button")
                             sleep(3)
+                            remove_popup()
                             continue
 
                 except Exception as e:
