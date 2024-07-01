@@ -237,26 +237,25 @@ class Ideogram:
                     logging.info("Prompt written successfully..")
 
                     # Last update on 2nd July 2024
-                    start_time = time()
-                    total_time = 150
-                    while True:
-                        try:
-                            logging.info("Trying to find generate button...")
-                            generate_button = WebDriverWait(self.driver, 3).until(
-                                EC.visibility_of_element_located((By.XPATH, '//div[text()="Generate"]'))
-                            )
-                            logging.info("Generate button found.")
-                            textarea_element.click()
-                            generate_button.click()
-                            break
-                        except Exception as e:
-                            logging.warning("Generate button not found...")
-                            logging.warning(f"Exception: {e}")
-                            if time() - start_time > total_time:
-                                raise TimeoutException("Generate button is not found even after 200 seconds...")
-                            logging.info("Trying again to find generate button")
-                            remove_popup(2)
-                            continue
+                    try:
+                        logging.info("Waiting until wait time button visible")
+                        WebDriverWait(self.driver, 150).until_not(
+                            EC.visibility_of_element_located((By.XPATH, '//button[contains(text(), "Wait")]'))
+                        )
+                    except Exception as e:
+                        logging.info(f"Something went wrong. Exception: {e}")
+                    else:
+                        logging.info("Waiting time button is not visible. So, generate button is clickable.")
+                        logging.info("Trying to find generate button...")
+                        generate_button = WebDriverWait(self.driver, 3).until(
+                            EC.visibility_of_element_located((By.XPATH, '//div[text()="Generate"]'))
+                        )
+                        if not generate_button:
+                            raise Exception("Generate Button Not Found")
+                        logging.info("Generate button found.")
+                        textarea_element.click()
+                        generate_button.click()
+                        break
 
                 except Exception as e:
                     logging.error(f"Exception: {e}")
