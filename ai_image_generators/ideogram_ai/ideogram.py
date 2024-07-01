@@ -231,28 +231,31 @@ class Ideogram:
                     # Using same logic as we used in the button (given below). Using clientWidth to determine if element is visible or not.
                     for textarea_element in textarea_elements:
                         if int(textarea_element.get_property("clientWidth")) > 0:
+                            textarea_element.clear()
                             textarea_element.send_keys(prompt)
                             break
                     logging.info("Prompt written successfully..")
 
                     # Last update on 2nd July 2024
                     start_time = time()
-                    total_time = 200
+                    total_time = 150
                     while True:
-                        logging.info("Trying to find generate button...")
-                        generate_button = self.driver.find_element(By.XPATH, '//div[text()="Generate"]')
-                        if generate_button:
+                        try:
+                            logging.info("Trying to find generate button...")
+                            generate_button = WebDriverWait(self.driver, 3).until(
+                                EC.visibility_of_element_located((By.XPATH, '//div[text()="Generate"]'))
+                            )
                             logging.info("Generate button found.")
                             textarea_element.click()
                             generate_button.click()
                             break
-                        else:
+                        except Exception as e:
                             logging.warning("Generate button not found...")
+                            logging.warning(f"Exception: {e}")
                             if time() - start_time > total_time:
                                 raise TimeoutException("Generate button is not found even after 200 seconds...")
                             logging.info("Trying again to find generate button")
-                            sleep(3)
-                            remove_popup()
+                            remove_popup(2)
                             continue
 
                 except Exception as e:
