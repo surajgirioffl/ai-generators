@@ -2,11 +2,12 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 20th May 2024
-Last-modified: 30th June 2024
+Last-modified: 02nd July 2024
 Error-series: 1600
 """
 
 import logging
+from time import time
 import os
 from time import sleep
 from typing import Any, Literal
@@ -134,7 +135,7 @@ class Ideogram:
             list: A list of image links fetched based on the prompt.
         """
         logging.info("Fetching images links...")
-        wait = WebDriverWait(self.driver, 300)
+        wait = WebDriverWait(self.driver, 600)
         # Wait until the paragraph contents changes to "Generation completed"
         logging.info("waiting for generation to complete...")
         wait.until(
@@ -234,8 +235,25 @@ class Ideogram:
                             break
                     logging.info("Prompt written successfully..")
 
-                    # Last update on 17th June 2024
-                    self.driver.find_element(By.XPATH, '//div[text()="Generate"]').click()
+                    # Last update on 2nd July 2024
+                    start_time = time()
+                    total_time = 200
+                    while True:
+                        logging.info("Trying to find generate button...")
+                        generate_button = EC.visibility_of_element_located((By.XPATH, '//div[text()="Generate"]'))
+                        if generate_button:
+                            logging.info("Generate button found.")
+                            textarea_element.click()
+                            generate_button.click()
+                            break
+                        else:
+                            logging.warning("Generate button not found...")
+                            if time() - start_time > total_time:
+                                raise TimeoutException("Generate button is not found even after 200 seconds...")
+                            logging.info("Trying again to find generate button")
+                            sleep(3)
+                            continue
+
                 except Exception as e:
                     logging.error(f"Exception: {e}")
                     logging.info("Removing pop-message if available and try again..")
