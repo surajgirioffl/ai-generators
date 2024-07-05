@@ -2,10 +2,11 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 23rd May 2024
-Last-modified: 23rd May 2024
+Last-modified: 06th July 2024
 Error-series: 1300
 """
 
+from datetime import datetime
 import json
 import logging
 import os
@@ -86,3 +87,51 @@ def get_webdriver_instance(browser: str = "chrome", headless=False, profile_dir_
     else:
         logging.error("Browser not supported. Please use Chrome or Edge. Error Code: 1302")
         return None
+
+
+def generate_file_name(
+    prompt: str = None,
+    image_path=None,
+    timestamp: datetime | str = None,
+    index: int = None,
+    timestamp_format: str = "%Y%m%d%H%M%S%f",
+    extension: str = None,
+) -> str:
+    """Generates a file name based on the provided prompt, image path, timestamp, and index.
+
+    Parameters:
+        - prompt (str, optional): The prompt to be used in the file name. Defaults to None. (Compulsory if image_path is not provided).
+        - image_path (any, optional): The path to the image. Defaults to None (Compulsory if prompt is not provided).
+        - timestamp (datetime | str, optional): The timestamp to be included in the file name. Defaults to None. If not provided then datetime.now() will used.
+        - index (int, optional): The index to be appended to the file name. Defaults to None.
+        - timestamp_format (str, optional): The format of the timestamp. Defaults to "%Y%m%d%H%M%S%f".
+        - extension (str, optional): The extension for the filename. Default to "None". If not provided then filename without extension will return.
+
+    More:
+        - If prompt and image_path both are provided then prompt will used because it has more priority.
+
+    Returns:
+        str: The generated file name based on the inputs.
+    """
+    if prompt is None and image_path is None:
+        raise ValueError("Either prompt or image_path must be provided.")
+    max_file_size = 256  # In windows
+    max_prompt_size = max_file_size - 30  # 30 for adding timestamp, index, underscores etc
+
+    if image_path:
+        image_path = os.path.splitext(os.path.basename(image_path))[0]
+
+    filename_prefix = prompt if prompt else image_path  # Prompt has top priority if both is provided.
+
+    if timestamp:
+        if isinstance(timestamp, datetime):
+            timestamp = timestamp.strftime(timestamp_format)
+    else:
+        timestamp = datetime.now().strftime(timestamp_format)
+
+    if len(filename_prefix) > max_prompt_size:
+        filename_prefix = filename_prefix[:max_prompt_size]
+    if extension:
+        return f"{filename_prefix}_{str(timestamp)}_{index}.{extension}" if index else f"{filename_prefix}_{str(timestamp)}.{extension}"
+    else:
+        return f"{filename_prefix}_{str(timestamp)}_{index}" if index else f"{filename_prefix}_{str(timestamp)}"
