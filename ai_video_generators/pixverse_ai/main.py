@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 7th May 2024
-Last-modified: 30th June 2024
+Last-modified: 06th July 2024
 Error-series: 1100
 """
 
@@ -15,6 +15,7 @@ __version__ = "1.0.0"
 import logging
 import os
 from time import sleep
+from datetime import datetime
 import re
 from undetected_chromedriver import Chrome, ChromeOptions
 from undetected_edgedriver import Edge, EdgeOptions
@@ -23,6 +24,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
+import tools
 
 if __name__ == "__main__":
     import pixverse
@@ -262,7 +264,12 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
             logging.info(f"Initiating video generation for the image index {index}...")
             pixverse.create_video_from_images(driver, **site_preferences["options"])
             link = pixverse.fetch_generated_video_link(driver)
-            downloaded_video_path = pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
+            logging.info("Video linked fetched successfully...")
+            timestamp = datetime.now()
+            filename = tools.generate_file_name(image_path=image, timestamp=timestamp, extension="mp4")
+            downloaded_video_path = pixverse.download_video(
+                link, CONFIG["Default_location_start"]["default_output_location_local"], filename
+            )
             logging.info(f"Operation Completed for the image index {index}")
 
             # Saving the required entities into the database
@@ -271,6 +278,7 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
                 category=site_preferences["category"],
                 site_id=db.get_site_id(site_preferences["site"]),
                 image_id=db.insert_image(image),
+                timestamp=timestamp,
             )
             logging.info("Output details successfully inserted into the database...")
 
@@ -288,7 +296,12 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
             logging.info(f"Initiating image generation for the prompt index {index}...")
             pixverse.create_video_from_prompt(driver, **site_preferences["options"])
             link = pixverse.fetch_generated_video_link(driver)
-            downloaded_video_path = pixverse.download_video(link, CONFIG["Default_location_start"]["default_output_location_local"])
+            logging.info("Video linked fetched successfully...")
+            timestamp = datetime.now()
+            filename = tools.generate_file_name(prompt=prompt, timestamp=timestamp, extension="mp4")
+            downloaded_video_path = pixverse.download_video(
+                link, CONFIG["Default_location_start"]["default_output_location_local"], filename
+            )
             logging.info(f"Operation Completed for the prompt index {index}")
 
             # Saving the required entities into the database
@@ -297,6 +310,7 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
                 category=site_preferences["category"],
                 site_id=db.get_site_id(site_preferences["site"]),
                 prompt_id=db.insert_prompt(prompt),
+                timestamp=timestamp,
             )
             logging.info("Output details successfully inserted into the database...")
 
