@@ -3,7 +3,7 @@
 Driver module to integrate and execute the script.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 17th May 2024
-Last-modified: 30th June 2024
+Last-modified: 06th July 2024
 Error-series: 1300
 """
 
@@ -13,6 +13,8 @@ __version__ = "0.0.0"
 
 
 import logging
+from datetime import datetime
+import tools
 import os
 from time import sleep
 import re
@@ -263,8 +265,12 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
             site_preferences["options"]["image"] = image
             logging.info(f"Initiating video generation for the image index {index}...")
             haiper.create_video_with_image(**site_preferences["options"])
+            generated_video_link = haiper.fetch_generated_video_link()
+            logging.info("Video link successfully fetched...")
+            timestamp = datetime.now()
+            filename = tools.generate_file_name(image_path=image, timestamp=timestamp, extension="mp4")
             downloaded_video_path = haiper.download_video(
-                haiper.fetch_generated_video_link(), CONFIG["Default_location_start"]["default_output_location_local"]
+                generated_video_link, CONFIG["Default_location_start"]["default_output_location_local"], filename
             )
             logging.info(f"Operation Completed for the image index {index}")
 
@@ -274,6 +280,7 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
                 category=site_preferences["category"],
                 site_id=db.get_site_id(site_preferences["site"]),
                 image_id=db.insert_image(image),
+                timestamp=timestamp,
             )
             logging.info("Output details successfully inserted into the database...")
 
@@ -290,8 +297,12 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
             site_preferences["options"]["prompt"] = prompt
             logging.info(f"Initiating image generation for the prompt index {index}...")
             haiper.create_video_with_prompt(**site_preferences["options"])
+            generated_video_link = haiper.fetch_generated_video_link()
+            logging.info("Video link successfully fetched...")
+            timestamp = datetime.now()
+            filename = tools.generate_file_name(prompt=prompt, timestamp=timestamp, extension="mp4")
             downloaded_video_path = haiper.download_video(
-                haiper.fetch_generated_video_link(), CONFIG["Default_location_start"]["default_output_location_local"]
+                generated_video_link, CONFIG["Default_location_start"]["default_output_location_local"], filename
             )
             logging.info(f"Operation Completed for the prompt index {index}")
 
@@ -301,6 +312,7 @@ def main(site_preferences: dict, driver=None, *args, **kwargs) -> None:
                 category=site_preferences["category"],
                 site_id=db.get_site_id(site_preferences["site"]),
                 prompt_id=db.insert_prompt(prompt),
+                timestamp=timestamp,
             )
             logging.info("Output details successfully inserted into the database...")
 
