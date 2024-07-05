@@ -37,7 +37,12 @@ tools.configure_logging(SETTINGS["logging_location"])
 
 
 def generate_file_name(
-    prompt: str = None, image_path=None, timestamp: datetime | str = None, index: int = None, timestamp_format: str = "%Y%m%d%H%M%S%f"
+    prompt: str = None,
+    image_path=None,
+    timestamp: datetime | str = None,
+    index: int = None,
+    timestamp_format: str = "%Y%m%d%H%M%S%f",
+    extension: str = "txt",
 ) -> str:
     """Generates a file name based on the provided prompt, image path, timestamp, and index.
 
@@ -47,6 +52,7 @@ def generate_file_name(
         - timestamp (datetime | str, optional): The timestamp to be included in the file name. Defaults to None. If not provided then datetime.now() will used.
         - index (int, optional): The index to be appended to the file name. Defaults to None.
         - timestamp_format (str, optional): The format of the timestamp. Defaults to "%Y%m%d%H%M%S%f".
+        - extension (str, optional): The extension for the filename. Default to "txt".
 
     More:
         - If prompt and image_path both are provided then prompt will used because it has more priority.
@@ -73,7 +79,7 @@ def generate_file_name(
     if len(filename_prefix) > max_prompt_size:
         filename_prefix = filename_prefix[:max_prompt_size]
 
-    return f"{filename_prefix}_{str(timestamp)}_{index}" if index else f"{filename_prefix}_{str(timestamp)}"
+    return f"{filename_prefix}_{str(timestamp)}_{index}.{extension}" if index else f"{filename_prefix}_{str(timestamp)}.{extension}"
 
 
 def main(site_preferences: dict, driver=None, *args, **kwargs):
@@ -115,7 +121,7 @@ def main(site_preferences: dict, driver=None, *args, **kwargs):
         generated_article, prompt_response_mapping = wordhero.generate_article(**site_preferences["options"])
         logging.info("Article generated successfully...")
         timestamp = datetime.now()
-        filename = generate_file_name(prompt=headline, timestamp=timestamp)
+        filename = generate_file_name(prompt=headline, timestamp=timestamp, extension="txt")
         output_filepath = WordHero.save_content(generated_article, SETTINGS["output_location"], filename)
         logging.info(f"Article {index} of the batch saved successfully...")
 
