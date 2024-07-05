@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 20th May 2024
-Last-modified: 02nd July 2024
+Last-modified: 06th July 2024
 Error-series: 1600
 """
 
@@ -255,7 +255,7 @@ class Ideogram:
                         logging.info("Generate button found.")
                         textarea_element.click()
                         generate_button.click()
-                        break
+                        logging.info("Generate button clicked...")
 
                 except Exception as e:
                     logging.error(f"Exception: {e}")
@@ -263,9 +263,28 @@ class Ideogram:
                     remove_popup()
                     continue
                 else:
-                    return
+                    # Below is added on 6th July 2024
+                    # Let's confirm if Generate button is clicked or not (Biggest issue in the Ideogram)
+                    generation_progress_indicator_xpath = "//p[contains(text(), 'Generation progress')]"
+                    try:
+                        WebDriverWait(self.driver, 12).until(
+                            EC.visibility_of_element_located((By.XPATH, generation_progress_indicator_xpath))
+                        )
+                    except Exception as e:
+                        logging.error("Generate button is not clicked because generation is not in progress.")
+                        logging.exception(f"Exception: {e}")
+                        logging.info("Try to click once again...")
+                        textarea_element.click()
+                        self.driver.find_element(By.XPATH, '//div[text()="Generate"]').click()
+                        logging.info("Clicked...")
+                    else:
+                        logging.info("Generate button successfully clicked (100%). AI Generation is in process...")
+                        return
 
             logging.error("Loop exhausted but option has not been performed. Error Code: 1603")
+            logging.warning(
+                "Below code should not executed and deprecated. If you are going through this message in the log file then It should be noted that 'Generate button' has been not been clicked successfully (failed). And AI Generation will stop for @Ideogram."
+            )
 
             # Above code return generate button only if prompt is written else it will return no element.
             # Below code is deprecated now because it works sometime and sometime not.
