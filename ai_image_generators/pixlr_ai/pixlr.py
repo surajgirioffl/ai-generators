@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 27th May 2024
-Last-modified: 17th June 2024
+Last-modified: 06th July 2024
 Error-series: 1200
 """
 
@@ -233,7 +233,7 @@ class Pixlr:
         Parameters:
             links (list[str]): A list of URLs pointing to the images to be downloaded.
             path (str): The local directory path where the images will be saved.
-            filenames (list[str], optional): A list of custom filenames corresponding to the downloaded images. Defaults to None.
+            filename (str, optional): A custom filename for to the downloaded images. Defaults to None.
 
         Returns:
             list[str]: A list of absolute paths to the downloaded images.
@@ -250,7 +250,7 @@ class Pixlr:
 
         for index, image_data in enumerate(decoded_images_data):
             if original_filename:
-                filename = f"{filename}_{index}.png"
+                filename = f"{filename}_{index+1}.png"
             else:
                 filename = datetime.now().strftime(f"pixlr_%Y%m%d%H%M%S_{index}.png")
 
