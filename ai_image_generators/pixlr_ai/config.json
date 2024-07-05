@@ -3,13 +3,5 @@
     "pixlr_credentials": {
         "email": "",
         "password": ""
-    },
-    "pixlr_image_options": {
-        "aspect_ratio": "Square",
-        "style": null,
-        "color": null,
-        "lighting": null,
-        "composition": null,
-        "negative_prompt": false
     }
 }
