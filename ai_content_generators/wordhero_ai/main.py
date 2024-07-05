@@ -122,7 +122,7 @@ def main(site_preferences: dict, driver=None, *args, **kwargs):
         logging.info("Article generated successfully...")
         timestamp = datetime.now()
         filename = generate_file_name(prompt=headline, timestamp=timestamp, extension="txt")
-        output_filepath = WordHero.save_content(generated_article, SETTINGS["output_location"], filename)
+        output_filepath = WordHero.save_content(generated_article, SETTINGS["output_location"], filename, headline)
         logging.info(f"Article {index} of the batch saved successfully...")
 
         # Saving the required entities into the database
