@@ -3,7 +3,7 @@
 You can import this module to perform database operations for any site.
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 28th June 2024
-Last-modified: 21st June 2024
+Last-modified: 5th July 2024
 """
 
 from datetime import datetime
@@ -80,7 +80,9 @@ class AIGeneratorDB:
         self.session.commit()
         return row.id
 
-    def insert_output(self, file_path: str | list, category: str, site_id: str, prompt_id: str = None, image_id: str = None):
+    def insert_output(
+        self, file_path: str | list, category: str, site_id: str, prompt_id: str = None, image_id: str = None, timestamp: datetime = None
+    ):
         """Insert the output into the database.
 
         Parameters:
@@ -89,6 +91,7 @@ class AIGeneratorDB:
             site_id (str): The ID of the site.
             prompt_id (str, optional): The ID of the prompt (default is None).
             image_id (str, optional): The ID of the image (default is None).
+            timestamp (datetime, optional): The timestamp of AI generation (default is None). If None then datetime.now() will used.
         """
         if isinstance(file_path, str):
             self.session.add(
@@ -98,12 +101,19 @@ class AIGeneratorDB:
                     site_id=site_id,
                     prompt_id=prompt_id,
                     image_id=image_id,
-                    timestamp=datetime.now(),
+                    timestamp=timestamp if timestamp else datetime.now(),
                 )
             )
         else:
             rows = [
-                Output(file_path=path, category=category, site_id=site_id, prompt_id=prompt_id, image_id=image_id, timestamp=datetime.now())
+                Output(
+                    file_path=path,
+                    category=category,
+                    site_id=site_id,
+                    prompt_id=prompt_id,
+                    image_id=image_id,
+                    timestamp=timestamp if timestamp else datetime.now(),
+                )
                 for path in file_path
             ]
             self.session.add_all(rows)
