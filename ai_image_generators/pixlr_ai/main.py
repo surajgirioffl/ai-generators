@@ -30,8 +30,8 @@ PROJECT_DIR = os.path.dirname(__file__)
 os.chdir(PROJECT_DIR)
 logging.info(f"New CWD: {os.getcwd()}")
 
-APP_REQUIRED_DIRS = ["appdata", "appdata/logs", "appdata/profile", "output"]
 SETTINGS: dict = tools.load_settings("config.json")
+APP_REQUIRED_DIRS = ["appdata", "appdata/logs", "appdata/profile", SETTINGS["output_location"]]
 
 tools.create_app_require_directories(APP_REQUIRED_DIRS)
 tools.configure_logging(SETTINGS["logging_location"])
@@ -123,7 +123,7 @@ def main(site_preferences: dict, driver=None, *args, **kwargs):
         logging.info("Image links fetched successfully....")
         timestamp = datetime.now()
         filename = generate_file_name(prompt=prompt, timestamp=timestamp)
-        downloaded_images_path = pixlr.download_images(images_links, "output", filename)
+        downloaded_images_path = pixlr.download_images(images_links, SETTINGS["output_location"], filename)
         logging.info(f"Done for the prompt index {index} (Message by Pixlr)")
 
         # Saving the required entities into the database
