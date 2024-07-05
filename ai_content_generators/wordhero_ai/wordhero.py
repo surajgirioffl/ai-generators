@@ -2,7 +2,7 @@
 
 Author: Suraj Kumar Giri (@surajgirioffl)
 Init-date: 23rd May 2024
-Last-modified: 16th June 2024
+Last-modified: 5th July 2024
 Error-series: 1200
 """
 
@@ -36,13 +36,14 @@ class WordHero:
         self.wait = WebDriverWait(self.driver, 60)
 
     @staticmethod
-    def save_content(content: str, path: str, filename: str = None) -> str:
+    def save_content(content: str, path: str, filename: str = None, headline: str = None) -> str:
         """Save the content to a file.
 
         Args:
             content (str): The content to be saved.
             path (str): The directory path where the video will be saved.
             filename (str, optional): The name of the file to save the content as. If not provided, a default filename will be generated.
+            headline (str, optional): The headline of the article (default to None). If provided then it will added to top of the article.
 
         Returns:
             str: The absolute path of the saved file.
@@ -50,6 +51,8 @@ class WordHero:
         if not filename:
             filename = datetime.now().strftime("wordhero_%Y%m%d%H%M%S.txt")
         with open(os.path.join(path, filename), "w") as file:
+            if headline:
+                content = headline + "\n\n" + content
             file.write(content)
             created_filename = file.name
         return os.path.abspath(created_filename)
