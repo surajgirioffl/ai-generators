@@ -3,5 +3,6 @@
     "pixlr_credentials": {
         "email": "",
         "password": ""
-    }
+    },
+    "output_location": "output"
 }
