@@ -216,13 +216,55 @@ class Ideogram:
                 pop_up_div.find_element(By.TAG_NAME, "button").click()
                 logging.info("Pop up removed successfully...")
 
+        def click_on_generate_button():
+            # Last update on 2nd July 2024
+            try:
+                logging.info("Executing the function that clicks on the Generate button...")
+                logging.info("Waiting until wait time button visible")
+                WebDriverWait(self.driver, 150).until_not(
+                    EC.visibility_of_element_located((By.XPATH, '//button[contains(text(), "Wait")]'))
+                )
+                logging.info("Waiting time button is not visible. So, generate button is clickable.")
+                logging.info("Trying to find generate button...")
+                generate_button = WebDriverWait(self.driver, 3).until(
+                    EC.visibility_of_element_located((By.XPATH, '//div[text()="Generate"]'))
+                )
+                if not generate_button:
+                    raise Exception("Generate Button Not Found")
+                logging.info("Generate button found.")
+                textarea_element.click()
+                generate_button.click()
+                logging.info("Generate button clicked...")
+            except Exception as e:
+                logging.info(f"Something went wrong. Exception: {e}")
+                return False
+            else:
+                return True
+
+        def is_generate_button_clicked():
+            generation_progress_indicator_xpath = "//p[contains(text(), 'Generation progress')]"
+            try:
+                WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, generation_progress_indicator_xpath)))
+            except Exception:
+                # document.querySelectorAll(".MuiTypography-root.MuiTypography-body1.css-vsgu40")
+                # Sometimes p['Generation progress'] disappear very fast and at the place of 'Generation progress', 'Generation completed' is written.
+                # Let's search via query selector, if they exists means Image is generating or generated.
+                try:
+                    self.driver.find_element(By.CSS_SELECTOR, ".MuiTypography-root.MuiTypography-body1.css-vsgu40")
+                except NoSuchElementException:
+                    return False
+                else:
+                    return True
+            else:
+                return True
+
         screen_width = self.driver.execute_script("return window.innerWidth")
         if screen_width >= 900:
             logging.info("Screen width is greater that 900px (or equal to)")
             logging.info("Trying to fetch the textarea element.")
             # In this case, there are two textarea elements with same selector. By fetching using querySelector, index may be different for desired textarea in different session.
             # In all possibility, two textarea are returning.
-            for _ in range(2):
+            for _ in range(2):  # This loop is only to remove pop-up message.
                 try:
                     prompt_textarea_selector = "textarea[placeholder='What do you want to create?']"
                     self.wait.until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, prompt_textarea_selector)))
@@ -235,27 +277,7 @@ class Ideogram:
                             textarea_element.send_keys(prompt)
                             break
                     logging.info("Prompt written successfully..")
-
-                    # Last update on 2nd July 2024
-                    try:
-                        logging.info("Waiting until wait time button visible")
-                        WebDriverWait(self.driver, 150).until_not(
-                            EC.visibility_of_element_located((By.XPATH, '//button[contains(text(), "Wait")]'))
-                        )
-                    except Exception as e:
-                        logging.info(f"Something went wrong. Exception: {e}")
-                    else:
-                        logging.info("Waiting time button is not visible. So, generate button is clickable.")
-                        logging.info("Trying to find generate button...")
-                        generate_button = WebDriverWait(self.driver, 3).until(
-                            EC.visibility_of_element_located((By.XPATH, '//div[text()="Generate"]'))
-                        )
-                        if not generate_button:
-                            raise Exception("Generate Button Not Found")
-                        logging.info("Generate button found.")
-                        textarea_element.click()
-                        generate_button.click()
-                        logging.info("Generate button clicked...")
+                    click_on_generate_button()
 
                 except Exception as e:
                     logging.error(f"Exception: {e}")
@@ -265,25 +287,19 @@ class Ideogram:
                 else:
                     # Below is added on 6th July 2024
                     # Let's confirm if Generate button is clicked or not (Biggest issue in the Ideogram)
-                    generation_progress_indicator_xpath = "//p[contains(text(), 'Generation progress')]"
-                    try:
-                        WebDriverWait(self.driver, 12).until(
-                            EC.visibility_of_element_located((By.XPATH, generation_progress_indicator_xpath))
-                        )
-                    except Exception as e:
-                        logging.error("Generate button is not clicked because generation is not in progress.")
-                        logging.exception(f"Exception: {e}")
-                        logging.info("Try to click once again...")
-                        textarea_element.click()
-                        self.driver.find_element(By.XPATH, '//div[text()="Generate"]').click()
-                        logging.info("Clicked...")
-                    else:
-                        logging.info("Generate button successfully clicked (100%). AI Generation is in process...")
-                        return
+                    for _ in range(5):
+                        if not is_generate_button_clicked():
+                            logging.error("Generate button is not clicked because generation is not in progress.")
+                            logging.info("Try to click once again...")
+                            logging.info(f"Retrying({_+1}/5) to click on the Generate button...")
+                            click_on_generate_button()
+                        else:
+                            logging.info("Generate button successfully clicked (100%). AI Generation is in process...")
+                            return
 
             logging.error("Loop exhausted but option has not been performed. Error Code: 1603")
             logging.warning(
-                "Below code should not executed and deprecated. If you are going through this message in the log file then It should be noted that 'Generate button' has been not been clicked successfully (failed). And AI Generation will stop for @Ideogram."
+                "Below code should not executed and deprecated. If you are going through this message in the log file then It should be noted that 'Generate button' has been not been clicked successfully (failed after several attempts). And AI Generation will stop for @Ideogram."
             )
 
             # Above code return generate button only if prompt is written else it will return no element.
