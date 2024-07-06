@@ -6,6 +6,7 @@ Last-modified: 06th July 2024
 Error-series: 1600
 """
 
+import re
 import logging
 from time import time
 import os
@@ -145,9 +146,29 @@ class Ideogram:
         )
         logging.info("Generation completed.")
         links = []
-        prompt = prompt.strip().strip(".").replace(" ", "_")
-        if len(prompt) > 40:
-            prompt = prompt[:40]
+
+        def clean_prompt(prompt: str) -> str:
+            # If prompt is "Lord shiva-parvati, lord vishnu-lakshmi blessing some person named as suraj,ram-kumar, akhilesh"
+            # Then data-download-name will "Lord_shivaparvati_lord_vishnulakshmi_"
+            # Here, Len of data-download-name is 37. All space and special chars are replaced with underscore or simply removed.
+
+            # Logic (Found after analysis - 6th July 2024):
+            # Characters, numbers and underscore are allowed only.
+            # Only spaces are replaced with underscore.
+            # Any other special chars except space are removed completely.
+            # data-download-length is not 40 always because this is not the factor of deciding length.
+            # 40 chars from original prompt is selected (if prompt length is 40 or more) then all special chars except spaces are removed and then spaces are replaced with underscore.
+            # This is why, data-download-name length vary. Because 40 chars are from prompt and after removal/replace, data-download-name is obtained.
+
+            # Extracting only 40 chars of prompt if prompt lenght is more than 40
+            if len(prompt) > 40:
+                prompt = prompt[:40]
+            # Removing special chars except space
+            re.sub(r"[^a-zA-Z0-9 ]+", "", prompt)
+            prompt = prompt.replace(" ", "_")
+            return prompt
+
+        prompt = clean_prompt(prompt)
         request_response_div = self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, f"div[data-download-name*='{prompt}']")))
         data_request_id = request_response_div.get_attribute("data-request-id")
         logging.info(f"Request ID: {data_request_id}")
