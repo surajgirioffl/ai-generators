@@ -164,7 +164,7 @@ class Ideogram:
             if len(prompt) > 40:
                 prompt = prompt[:40]
             # Removing special chars except space
-            re.sub(r"[^a-zA-Z0-9 ]+", "", prompt)
+            prompt = re.sub(r"[^a-zA-Z0-9 ]+", "", prompt)
             prompt = prompt.replace(" ", "_")
             return prompt
 
