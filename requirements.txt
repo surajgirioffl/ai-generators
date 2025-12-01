@@ -7,7 +7,7 @@ charset-normalizer==3.3.2
 clr-loader==0.2.6
 et-xmlfile==1.1.0
 exceptiongroup==1.2.1
-fonttools==4.53.0
+fonttools==4.61.0
 greenlet==3.0.3
 h11==0.14.0
 idna==3.7
